@@ -1,0 +1,27 @@
+<idea-plugin version="2">
+    <name>Color Ide</name>
+
+    <id>ColorIde</id>
+
+    <description>Applies editor background color to all tree views</description>
+
+    <change-notes>Added support of idea 10.5</change-notes>
+
+    <version>2.3</version>
+
+    <idea-version since-build="107.105"/>
+
+    <vendor url="https://github.com/dmalch/ColorIde">Dmitry Malchikov</vendor>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <application-components>
+        <component>
+            <implementation-class>com.github.dmalch.ColorIdeApplicationComponent</implementation-class>
+        </component>
+    </application-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="com.github.dmalch.ColorIdeSystemSettings"/>
+    </extensions>
+</idea-plugin>
