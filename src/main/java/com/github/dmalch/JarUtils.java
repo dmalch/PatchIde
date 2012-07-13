@@ -6,7 +6,10 @@ import de.schlichtherle.truezip.file.TFileWriter;
 import de.schlichtherle.truezip.file.TVFS;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Writer;
 
 import static java.io.File.separatorChar;
 import static java.text.MessageFormat.format;
@@ -26,9 +29,7 @@ public class JarUtils {
             final FileReader input = new FileReader(file);
 
             IOUtils.copy(input, writer);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             Closeables.closeQuietly(writer);
