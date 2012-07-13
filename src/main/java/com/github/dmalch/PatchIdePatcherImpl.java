@@ -1,6 +1,6 @@
 package com.github.dmalch;
 
-public class ColorIdePatcherImpl implements ColorIdePatcher {
+public class PatchIdePatcherImpl implements PatchIdePatcher {
     @Override
     public void applyPatch() {
     }

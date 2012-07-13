@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.github.dmalch.ColorIdeApplicationComponent.USER_ACCEPTED_PATCHING;
+import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.util.ui.ThreeStateCheckBox.State.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -16,16 +16,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ColorIdeSystemSettingsTest {
+public class PatchIdeSystemSettingsTest {
 
     @InjectMocks
-    private ColorIdeSystemSettings colorIdeSystemSettings;
+    private PatchIdeSystemSettings patchIdeSystemSettings;
 
     @Mock
     private PersistenceManager persistenceManager;
 
     @Mock
-    private ColorIdePatcher patcher;
+    private PatchIdePatcher patcher;
 
     @Mock
     private ApplicationRestarter restarter;
@@ -108,15 +108,15 @@ public class ColorIdeSystemSettingsTest {
     }
 
     private void whenUserAppliesRollback() throws ConfigurationException {
-        colorIdeSystemSettings.reset();
-        colorIdeSystemSettings.getShouldPatchIdea().setState(NOT_SELECTED);
-        colorIdeSystemSettings.apply();
+        patchIdeSystemSettings.reset();
+        patchIdeSystemSettings.getShouldPatchIdea().setState(NOT_SELECTED);
+        patchIdeSystemSettings.apply();
     }
 
     private void whenUserAppliesPatch() throws ConfigurationException {
-        colorIdeSystemSettings.reset();
-        colorIdeSystemSettings.getShouldPatchIdea().setState(SELECTED);
-        colorIdeSystemSettings.apply();
+        patchIdeSystemSettings.reset();
+        patchIdeSystemSettings.getShouldPatchIdea().setState(SELECTED);
+        patchIdeSystemSettings.apply();
     }
 
     private void givenPatchedFilesFound() {
@@ -136,18 +136,18 @@ public class ColorIdeSystemSettingsTest {
     }
 
     private void thenCheckBoxIsSelected() {
-        assertThat(colorIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(SELECTED));
+        assertThat(patchIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(SELECTED));
     }
 
     private void thenCheckBoxIsHalfSelected() {
-        assertThat(colorIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(DONT_CARE));
+        assertThat(patchIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(DONT_CARE));
     }
 
     private void thenCheckBoxIsNotSelected() {
-        assertThat(colorIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(NOT_SELECTED));
+        assertThat(patchIdeSystemSettings.getShouldPatchIdea().getState(), equalTo(NOT_SELECTED));
     }
 
     private void whenResetSettings() {
-        colorIdeSystemSettings.reset();
+        patchIdeSystemSettings.reset();
     }
 }

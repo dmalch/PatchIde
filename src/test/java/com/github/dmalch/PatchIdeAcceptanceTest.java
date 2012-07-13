@@ -6,14 +6,14 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.github.dmalch.ColorIdeApplicationComponent.SHOW_PATCH_DIALOG;
-import static com.github.dmalch.ColorIdeApplicationComponent.USER_ACCEPTED_PATCHING;
+import static com.github.dmalch.PatchIdeApplicationComponent.SHOW_PATCH_DIALOG;
+import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.openapi.ui.Messages.OK;
 import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ColorIdeAcceptanceTest {
+public class PatchIdeAcceptanceTest {
 
     @Mock
     private AcceptPatchingDialog acceptPatchingDialog;
@@ -22,16 +22,13 @@ public class ColorIdeAcceptanceTest {
     private ApplicationRestarter applicationRestarter;
 
     @Mock(answer = RETURNS_MOCKS)
-    private ColorSchemeManager colorSchemeManager;
-
-    @Mock(answer = RETURNS_MOCKS)
     private PersistenceManager persistenceManager;
 
     @Mock
-    private ColorIdePatcher patcher;
+    private PatchIdePatcher patcher;
 
     @InjectMocks
-    private final ColorIdeApplicationComponent colorIdeApplicationComponent = new ColorIdeApplicationComponent();
+    private final PatchIdeApplicationComponent patchIdeApplicationComponent = new PatchIdeApplicationComponent();
 
     @Before
     public void setUp() throws Exception {
@@ -168,7 +165,7 @@ public class ColorIdeAcceptanceTest {
     }
 
     private void whenStartColorIde() {
-        colorIdeApplicationComponent.initComponent();
+        patchIdeApplicationComponent.initComponent();
     }
 
     private void givenColorIdeIsRunFirstTime() {

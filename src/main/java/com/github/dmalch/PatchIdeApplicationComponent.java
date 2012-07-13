@@ -2,17 +2,14 @@ package com.github.dmalch;
 
 import com.google.common.base.Objects;
 import com.intellij.openapi.components.ApplicationComponent;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
 
-public class ColorIdeApplicationComponent implements ApplicationComponent {
+public class PatchIdeApplicationComponent implements ApplicationComponent {
 
     public static final String SHOW_PATCH_DIALOG = "colorIde.showPatchDialog";
     public static final String USER_ACCEPTED_PATCHING = "colorIde.userAcceptedPatching";
-
-    private ColorSchemeManager colorSchemeManager = new ColorSchemeManagerImpl();
 
     private PersistenceManager persistenceManager = new PersistenceManagerImpl();
 
@@ -20,14 +17,12 @@ public class ColorIdeApplicationComponent implements ApplicationComponent {
 
     private ApplicationRestarter applicationRestarter = new ApplicationRestarterImpl();
 
-    private ColorIdePatcher patcher = new ColorIdePatcherImpl();
+    private PatchIdePatcher patcher = new PatchIdePatcherImpl();
 
-    public ColorIdeApplicationComponent() {
+    public PatchIdeApplicationComponent() {
     }
 
     public void initComponent() {
-        applyColorSchemeColorsToTree();
-
         if (shouldShowPatchDialog()) {
             if (userWantsToPatchClasses()) {
                 userHasAcceptedPatching();
@@ -59,19 +54,6 @@ public class ColorIdeApplicationComponent implements ApplicationComponent {
         return Objects.equal(OK_EXIT_CODE, acceptPatchingDialog.showDialog());
     }
 
-    private void applyColorSchemeColorsToTree() {
-        final EditorColorsScheme globalScheme = colorSchemeManager.getGlobalColorScheme();
-
-        colorSchemeManager.setUiProperty("Viewport.foreground", globalScheme.getDefaultForeground());
-        colorSchemeManager.setUiProperty("Viewport.background", globalScheme.getDefaultBackground());
-
-        colorSchemeManager.setUiProperty("Tree.textForeground", globalScheme.getDefaultForeground());
-        colorSchemeManager.setUiProperty("Tree.textBackground", globalScheme.getDefaultBackground());
-
-        colorSchemeManager.setUiProperty("Tree.foreground", globalScheme.getDefaultForeground());
-        colorSchemeManager.setUiProperty("Tree.background", globalScheme.getDefaultBackground());
-    }
-
     private void doNotShowPatchDialogAnyMore() {
         persistenceManager.setBoolean(SHOW_PATCH_DIALOG, false);
     }
@@ -97,11 +79,7 @@ public class ColorIdeApplicationComponent implements ApplicationComponent {
 
     @NotNull
     public String getComponentName() {
-        return "ColorIdeApplicationComponent";
-    }
-
-    public void setColorSchemeManager(final ColorSchemeManager value) {
-        colorSchemeManager = value;
+        return "PatchIdeApplicationComponent";
     }
 
     public void setAcceptPatchingDialog(final AcceptPatchingDialog acceptPatchingDialog) {
@@ -116,11 +94,11 @@ public class ColorIdeApplicationComponent implements ApplicationComponent {
         this.applicationRestarter = applicationRestarter;
     }
 
-    public ColorIdePatcher getPatcher() {
+    public PatchIdePatcher getPatcher() {
         return patcher;
     }
 
-    public void setPatcher(final ColorIdePatcher patcher) {
+    public void setPatcher(final PatchIdePatcher patcher) {
         this.patcher = patcher;
     }
 

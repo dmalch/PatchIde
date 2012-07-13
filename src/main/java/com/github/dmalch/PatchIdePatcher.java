@@ -1,6 +1,6 @@
 package com.github.dmalch;
 
-public interface ColorIdePatcher {
+public interface PatchIdePatcher {
     void applyPatch();
 
     boolean checkFilesArePatched();

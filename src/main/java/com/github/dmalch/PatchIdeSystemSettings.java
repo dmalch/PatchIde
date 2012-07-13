@@ -8,17 +8,17 @@ import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
 
-import static com.github.dmalch.ColorIdeApplicationComponent.USER_ACCEPTED_PATCHING;
+import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.util.ui.ThreeStateCheckBox.State.*;
 
-public class ColorIdeSystemSettings implements Configurable {
+public class PatchIdeSystemSettings implements Configurable {
     private JPanel myPanel;
     private JLabel headerText;
     private ThreeStateCheckBox shouldPatchIdea;
 
     private PersistenceManager persistenceManager = new PersistenceManagerImpl();
 
-    private ColorIdePatcher patcher = new ColorIdePatcherImpl();
+    private PatchIdePatcher patcher = new PatchIdePatcherImpl();
 
     private ApplicationRestarter restarter = new ApplicationRestarterImpl();
 
@@ -98,7 +98,7 @@ public class ColorIdeSystemSettings implements Configurable {
         return shouldPatchIdea;
     }
 
-    public void setPatcher(final ColorIdePatcher patcher) {
+    public void setPatcher(final PatchIdePatcher patcher) {
         this.patcher = patcher;
     }
 

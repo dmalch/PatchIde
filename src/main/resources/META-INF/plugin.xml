@@ -1,13 +1,13 @@
 <idea-plugin version="2">
-    <name>Color Ide</name>
+    <name>Patch Ide</name>
 
-    <id>ColorIde</id>
+    <id>PatchIde</id>
 
-    <description>Applies editor background color to all tree views</description>
+    <description>Patches IDEA</description>
 
-    <change-notes>Added support of idea 10.5</change-notes>
+    <change-notes>Initial version</change-notes>
 
-    <version>2.3</version>
+    <version>1.0</version>
 
     <idea-version since-build="107.105"/>
 
@@ -17,11 +17,11 @@
 
     <application-components>
         <component>
-            <implementation-class>com.github.dmalch.ColorIdeApplicationComponent</implementation-class>
+            <implementation-class>com.github.dmalch.PatchIdeApplicationComponent</implementation-class>
         </component>
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.github.dmalch.ColorIdeSystemSettings"/>
+        <applicationConfigurable instance="com.github.dmalch.PatchIdeSystemSettings"/>
     </extensions>
 </idea-plugin>
