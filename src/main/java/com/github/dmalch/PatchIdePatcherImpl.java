@@ -1,8 +1,10 @@
 package com.github.dmalch;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.InputSupplier;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,7 +97,12 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
     protected long calcFileChecksum(final File file) {
         try {
-            return Files.getChecksum(file, new CRC32());
+            return ByteStreams.getChecksum(new InputSupplier<TFileInputStream>() {
+                @Override
+                public TFileInputStream getInput() throws IOException {
+                    return new TFileInputStream(file);
+                }
+            }, new CRC32());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
