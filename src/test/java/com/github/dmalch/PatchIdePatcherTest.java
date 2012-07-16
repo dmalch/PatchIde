@@ -11,6 +11,7 @@ import java.io.IOException;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class PatchIdePatcherTest extends AbstractPatchTest {
@@ -40,7 +41,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
-    public void testApplyRollback() throws Exception {
+    public void testApplyRollbackWhenFilesWereChanged() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
         final String expectedFileValue = readFileContent(zipFileToPatch);
@@ -48,9 +49,32 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
         whenApplyPatch(patcher);
-        whenApplyRollback(patcher);
+        final boolean result = whenApplyRollback(patcher);
 
+        thenFilesWereActuallyRolledBack(result);
         thenRollbackIsApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
+    public void testApplyRollbackWhenNoFilesWereChanged() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final String expectedFileValue = readFileContent(zipFileToPatch);
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        final boolean result = whenApplyRollback(patcher);
+
+        thenFilesWereNotRolledBack(result);
+        thenRollbackIsApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    private void thenFilesWereNotRolledBack(final boolean result) {
+        assertThat(result, is(false));
+    }
+
+    private void thenFilesWereActuallyRolledBack(final boolean result) {
+        assertThat(result, is(true));
     }
 
     private void thenRollbackFileIsCreated(final TFile zipFileToPatch, final String expectedFileValue) {
@@ -66,8 +90,8 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         assertThat(fileToPatchValue, equalTo(expectedFileValue));
     }
 
-    private void whenApplyRollback(final PatchIdePatcher patcher) {
-        patcher.applyRollback();
+    private boolean whenApplyRollback(final PatchIdePatcher patcher) {
+        return patcher.applyRollback();
     }
 
     private String givenExpectedDir() {
