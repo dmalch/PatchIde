@@ -1,10 +1,13 @@
 package com.github.dmalch;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import de.schlichtherle.truezip.file.TFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
+import java.util.zip.CRC32;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.text.MessageFormat.format;
@@ -76,8 +79,22 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         return jarWasModified;
     }
 
-    private boolean filesAreDifferent(final File bakFile, final File jarEntry) {
-        return bakFile.compareTo(jarEntry) != 0;
+    private boolean filesAreDifferent(final File origFile, final File jarEntry) {
+        try {
+            final long orig = calcFileChecksum(origFile);
+            final long fromJar = calcFileChecksum(jarEntry);
+            return orig != fromJar;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    protected long calcFileChecksum(final File file) {
+        try {
+            return Files.getChecksum(file, new CRC32());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private File bakFile(final File patchFile, final File jarFile) {
