@@ -41,8 +41,7 @@ public class JarUtils {
             final TFile jar = new TFile(format("{0}{1}{2}{1}{3}", jarFile.getAbsolutePath(), separatorChar, dirInJar, file.getName()));
             jar.rm();
             TVFS.umount();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
         }
     }
 }
