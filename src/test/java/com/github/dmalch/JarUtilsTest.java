@@ -50,7 +50,7 @@ public class JarUtilsTest {
     }
 
     private void whenPutFileIntoJarFile(final File file, final File jarFile, final String dirInJar) {
-        putIntoJar(file, jarFile, dirInJar);
+        putIntoJar(file.getName(), jarFile, dirInJar, file.getName());
     }
 
     private void thenFileIsInJarFile(final File expectedFile, final File jarFile, final String dir) {

@@ -15,20 +15,63 @@ import static com.google.common.io.Closeables.closeQuietly;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class PatchIdePatcherTest {
     @Test
     public void testApplyPatchAtTheSpecifiedDirectory() throws Exception {
         final String expectedDir = givenExpectedDir();
-        final File expectedFile = givenExpectedFile(expectedDir);
+        final File expectedFile = givenPatchFile(expectedDir);
         final TFile zipFileToPatch = givenZipFileToPatch(expectedDir);
         final PatchIdePatcher patcher = givenPatcherFor(expectedFile, zipFileToPatch, expectedDir);
 
         whenApplyPatch(patcher);
 
         thenPatchIsApplied(zipFileToPatch, expectedFile);
+    }
+
+    @Test
+    public void testRollbackFileIsCreatedWhenPatchIsApplied() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final String expectedFileValue = readFileContent(zipFileToPatch);
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        whenApplyPatch(patcher);
+
+        thenRollbackFileIsCreated(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
+    public void testApplyRollback() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final String expectedFileValue = readFileContent(zipFileToPatch);
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        whenApplyPatch(patcher);
+        whenApplyRollback(patcher);
+
+        thenRollbackIsApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    private void thenRollbackFileIsCreated(final TFile zipFileToPatch, final String expectedFileValue) {
+        final String absolutePath = format("{0}/{1}.bak", zipFileToPatch.getInnerArchive().getParent(), zipFileToPatch.getEnclEntryName());
+        final String backupFileContent = readFileContent(new File(absolutePath));
+
+        assertThat(backupFileContent, equalTo(expectedFileValue));
+    }
+
+    private void thenRollbackIsApplied(final TFile zipFileToPatch, final String expectedFileValue) {
+        final String fileToPatchValue = readFileContent(zipFileToPatch);
+
+        assertThat(fileToPatchValue, equalTo(expectedFileValue));
+    }
+
+    private void whenApplyRollback(final PatchIdePatcher patcher) {
+        patcher.applyRollback();
     }
 
     private String givenExpectedDir() {
@@ -57,13 +100,12 @@ public class PatchIdePatcherTest {
         return fileContent;
     }
 
-    private File givenExpectedFile(final String copiedDirName) {
+    private File givenPatchFile(final String copiedDirName) {
         final File originalFile = new File("src/test/resources/file.txt");
         final File copiedDir = new File(format("out/test/{0}", copiedDirName));
         final File copiedFile = new File(copiedDir, format("file.txt", randomAlphanumeric(5)));
         try {
-            final boolean mkdirs = copiedDir.mkdirs();
-            assertThat(mkdirs, is(true));
+            copiedDir.mkdirs();
             Files.copy(originalFile, copiedFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -86,6 +128,7 @@ public class PatchIdePatcherTest {
     private PatchIdePatcher givenPatcherFor(final File expectedFile, final TFile zipFileToPatch, final String innerDirectory) {
         final PatchIdePatcherImpl patchIdePatcher = new PatchIdePatcherImpl();
         patchIdePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(zipFileToPatch.getInnerArchive().getAbsolutePath(), innerDirectory)));
+        new File("out/test/file.txt.bak").delete();
         return patchIdePatcher;
     }
 
@@ -97,3 +140,4 @@ public class PatchIdePatcherTest {
         patcher.applyPatch();
     }
 }
+
