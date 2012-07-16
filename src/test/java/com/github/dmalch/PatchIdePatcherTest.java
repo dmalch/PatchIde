@@ -1,5 +1,6 @@
 package com.github.dmalch;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileReader;
@@ -20,9 +21,9 @@ import static org.junit.Assert.assertThat;
 public class PatchIdePatcherTest {
     @Test
     public void testApplyPatch() throws Exception {
-        final File zipFileToPatch = givenZipFileToPatch();
+        final TFile zipFileToPatch = givenZipFileToPatch();
         final File expectedFile = givenExpectedFile();
-        final PatchIdePatcher patcher = givenPatcher();
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, zipFileToPatch);
 
         whenApplyPatch(patcher);
 
@@ -77,8 +78,10 @@ public class PatchIdePatcherTest {
         return new TFile(fileToPatch, "file.txt");
     }
 
-    private PatchIdePatcher givenPatcher() {
-        return new PatchIdePatcherImpl();
+    private PatchIdePatcher givenPatcherFor(final File expectedFile, final TFile zipFileToPatch) {
+        final PatchIdePatcherImpl patchIdePatcher = new PatchIdePatcherImpl();
+        patchIdePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), zipFileToPatch.getInnerArchive().getAbsolutePath()));
+        return patchIdePatcher;
     }
 
     private void whenApplyPatch(final PatchIdePatcher patcher) {
