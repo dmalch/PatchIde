@@ -70,13 +70,17 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
             final File bakFile = bakFile(patchFile, jarFile);
 
-            if (filesAreDifferent(bakFile, jarEntry)) {
+            if (bakFileExists(bakFile) && filesAreDifferent(bakFile, jarEntry)) {
                 JarUtils.putIntoJar(bakFile, jarEntry);
                 jarWasModified = true;
             }
         }
 
         return jarWasModified;
+    }
+
+    private boolean bakFileExists(final File bakFile) {
+        return bakFile.exists();
     }
 
     private boolean filesAreDifferent(final File origFile, final File jarEntry) {

@@ -38,15 +38,17 @@ public class JarUtils {
     }
 
     private static void createNewFile(final File patchFilePath, final TFile jar) {
+        FileReader input = null;
         Writer writer = null;
         try {
             writer = new TFileWriter(jar);
-            final FileReader input = new FileReader(patchFilePath);
+            input = new FileReader(patchFilePath);
 
             IOUtils.copy(input, writer);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            Closeables.closeQuietly(input);
             Closeables.closeQuietly(writer);
         }
     }

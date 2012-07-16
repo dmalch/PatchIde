@@ -41,7 +41,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
-    public void testApplyRollbackWhenFilesWereChanged() throws Exception {
+    public void testApplyRollbackWhenFilesWerePatched() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
         final String expectedFileValue = readFileContent(zipFileToPatch);
@@ -56,13 +56,29 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
-    public void testApplyRollbackWhenNoFilesWereChanged() throws Exception {
+    public void testApplyRollbackWhenNoPatchWasApplied() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
         final String expectedFileValue = readFileContent(zipFileToPatch);
 
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
+        final boolean result = whenApplyRollback(patcher);
+
+        thenFilesWereNotRolledBack(result);
+        thenRollbackIsApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
+    public void testApplyRollbackWhenPatchedFilesWereChangedToOriginal() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final String expectedFileValue = readFileContent(zipFileToPatch);
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        whenApplyPatch(patcher);
+        whenApplyRollback(patcher);
         final boolean result = whenApplyRollback(patcher);
 
         thenFilesWereNotRolledBack(result);
