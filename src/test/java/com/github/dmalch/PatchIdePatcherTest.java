@@ -69,6 +69,44 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         thenRollbackIsApplied(zipFileToPatch, expectedFileValue);
     }
 
+    @Test
+    public void testCheckModificationsWhenNoFilesChanged() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        final boolean result = whenCheckFilesArePatched(patcher);
+
+        thenFilesWereNotPatched(result);
+    }
+
+    @Test
+    public void testCheckModificationsWhenFilesWereActuallyChanged() throws Exception {
+        final File patchFile = givenPatchFile("");
+        final TFile zipFileToPatch = givenZipFileToPatch("");
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+
+        whenApplyPatch(patcher);
+
+        final boolean result = whenCheckFilesArePatched(patcher);
+
+        thenFilesWerePatched(result);
+    }
+
+    private void thenFilesWerePatched(final boolean result) {
+        assertThat(result, is(true));
+    }
+
+    private void thenFilesWereNotPatched(final boolean result) {
+        assertThat(result, is(false));
+    }
+
+    private boolean whenCheckFilesArePatched(final PatchIdePatcher patcher) {
+        return patcher.checkFilesArePatched();
+    }
+
     private void thenFilesWereNotRolledBack(final boolean result) {
         assertThat(result, is(false));
     }

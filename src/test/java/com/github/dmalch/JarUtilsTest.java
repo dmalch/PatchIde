@@ -49,7 +49,7 @@ public class JarUtilsTest extends AbstractPatchTest {
     }
 
     private void whenPutFileIntoJarFile(final File file, final File jarFile, final String dirInJar) {
-        putIntoJar(file.getAbsolutePath(), jarFile, dirInJar, file.getName());
+        putIntoJar(file, JarUtils.jarFile(jarFile, dirInJar, file.getName()));
     }
 
     private void thenFileIsInJarFile(final File expectedFile, final File jarFile, final String dir) {

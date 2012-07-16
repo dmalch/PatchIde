@@ -13,18 +13,17 @@ import static java.text.MessageFormat.format;
 
 public class JarUtils {
 
-    public static void putIntoJar(final String patchFilePath, final File jarFile, final String dirInJar, final String targetFileName) {
-        removeObsoleteFile(jarFile, dirInJar, targetFileName);
-        createNewFile(patchFilePath, jarFile, dirInJar, targetFileName);
+    public static void putIntoJar(final File patchFile, final TFile jarEntry) {
+        removeObsoleteFile(jarEntry);
+        createNewFile(patchFile, jarEntry);
     }
 
-    public static void extractFromJar(final File jarFile, final String dirInJar, final String targetFileName, final String fileNewName) {
+    public static void extractFromJar(final File fileNew, final TFile jarEntry) {
         Writer writer = null;
         TFileReader reader = null;
         try {
-            final TFile jar = new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dirInJar, targetFileName));
-            reader = new TFileReader(jar);
-            writer = new FileWriter(fileNewName);
+            reader = new TFileReader(jarEntry);
+            writer = new FileWriter(fileNew);
 
             IOUtils.copy(reader, writer);
         } catch (Exception ignored) {
@@ -34,10 +33,13 @@ public class JarUtils {
         }
     }
 
-    private static void createNewFile(final String patchFilePath, final File jarFile, final String dirInJar, final String targetFileName) {
+    public static TFile jarFile(final File jarFile, final String dirInJar, final String targetFileName) {
+        return new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dirInJar, targetFileName));
+    }
+
+    private static void createNewFile(final File patchFilePath, final TFile jar) {
         Writer writer = null;
         try {
-            final TFile jar = new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dirInJar, targetFileName));
             writer = new TFileWriter(jar);
             final FileReader input = new FileReader(patchFilePath);
 
@@ -49,9 +51,8 @@ public class JarUtils {
         }
     }
 
-    private static void removeObsoleteFile(final File jarFile, final String dirInJar, final String targetFileName) {
+    private static void removeObsoleteFile(final TFile jar) {
         try {
-            final TFile jar = new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dirInJar, targetFileName));
             jar.rm();
             TVFS.umount();
         } catch (IOException ignored) {
