@@ -8,9 +8,12 @@ import de.schlichtherle.truezip.file.TFileInputStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.zip.CRC32;
 
+import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.text.MessageFormat.format;
 
@@ -22,7 +25,8 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         for (final String patchFilePath : filesToPatch.keySet()) {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
-            final File patchFile = new File(patchFilePath);
+            final URI uri = getPatchFileURI(patchFilePath);
+            final TFile patchFile = new TFile(uri);
 
             final String targetFileName = patchFile.getName();
 
@@ -32,6 +36,15 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
             JarUtils.extractFromJar(bakFile(patchFile, jarFile), jarEntry);
             JarUtils.putIntoJar(patchFile, jarEntry);
         }
+    }
+
+    private URI getPatchFileURI(final String patchFilePath) {
+        URI uri = null;
+        try {
+            uri = getClass().getClassLoader().getResource(patchFilePath).toURI();
+        } catch (Exception ignored) {
+        }
+        return firstNonNull(uri, new File(patchFilePath).toURI());
     }
 
     @Override
@@ -112,6 +125,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         return new File(format("{0}/{1}.bak", jarFile.getParent(), patchFile.getName()));
     }
 
+    @Override
     public void setFilesToPatch(final ImmutableMap<String, PatchTarget> filesToPatch) {
         this.filesToPatch.putAll(filesToPatch);
     }

@@ -1,6 +1,7 @@
 package com.github.dmalch;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,7 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
     private PatchIdePatcher patcher = new PatchIdePatcherImpl();
 
     public PatchIdeApplicationComponent() {
+        patcher.setFilesToPatch(ImmutableMap.of("com/intellij/ui/treeStructure/Tree.class", new PatchTarget("com/intellij/ui/treeStructure", "../lib/openapi.jar")));
     }
 
     public void initComponent() {
