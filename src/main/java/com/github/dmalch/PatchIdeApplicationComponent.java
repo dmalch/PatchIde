@@ -29,14 +29,13 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
 
     public void initComponent() {
         if (shouldShowPatchDialog()) {
+            doNotShowPatchDialogAnyMore();
             if (userWantsToPatchClasses()) {
                 userHasAcceptedPatching();
                 patcher.applyPatch();
-                doNotShowPatchDialogAnyMore();
                 applicationRestarter.restart();
             } else {
                 userHasRejectedPatching();
-                doNotShowPatchDialogAnyMore();
                 if (patcher.applyRollback()) {
                     applicationRestarter.restart();
                 }

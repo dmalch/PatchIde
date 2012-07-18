@@ -19,6 +19,6 @@ public class ApplicationRestarterImpl implements ApplicationRestarter {
     }
 
     private int showDialog() {
-        return showYesNoDialog("Restart now?", "Restart", "Restart", "Cancel", getQuestionIcon());
+        return showYesNoDialog("Restart now?", "Restart", "Restart", "Postpone", getQuestionIcon());
     }
 }
