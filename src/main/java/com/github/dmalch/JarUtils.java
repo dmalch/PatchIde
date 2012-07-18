@@ -19,11 +19,11 @@ public class JarUtils {
     }
 
     public static void extractFromJar(final File fileNew, final TFile jarEntry) {
-        Writer writer = null;
+        TFileWriter writer = null;
         TFileReader reader = null;
         try {
             reader = new TFileReader(jarEntry);
-            writer = new FileWriter(fileNew);
+            writer = new TFileWriter(fileNew);
 
             IOUtils.copy(reader, writer);
         } catch (Exception ignored) {
@@ -39,7 +39,7 @@ public class JarUtils {
 
     private static void createNewFile(final File patchFilePath, final TFile jar) {
         TFileReader input = null;
-        Writer writer = null;
+        TFileWriter writer = null;
         try {
             writer = new TFileWriter(jar);
             input = new TFileReader(patchFilePath);

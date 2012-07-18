@@ -18,11 +18,11 @@ package com.intellij.ui.treeStructure;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.PresentableNodeDescriptor;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.update.ComparableObject;
 import com.intellij.util.ui.update.ComparableObjectCheck;
 import org.jetbrains.annotations.NotNull;
@@ -98,8 +98,7 @@ public abstract class SimpleNode extends PresentableNodeDescriptor implements Co
     Icon oldClosedIcon = myClosedIcon;
     List<ColoredFragment> oldFragments = new ArrayList<ColoredFragment>(presentation.getColoredText());
 
-    myColor = getDefaultForeground();
-
+    myColor = UIUtil.getTreeTextForeground();
     updateFileStatus();
 
     doUpdate();
@@ -109,15 +108,11 @@ public abstract class SimpleNode extends PresentableNodeDescriptor implements Co
 
     presentation.setChanged(changed ||
                             !Comparing.equal(new Object[]{myOpenIcon, myClosedIcon, myName, oldFragments, myColor},
-                                    new Object[]{oldOpenIcon, oldClosedIcon, oldName, oldFragments, oldColor}));
+                                             new Object[]{oldOpenIcon, oldClosedIcon, oldName, oldFragments, oldColor}));
 
     presentation.setForcedTextForeground(myColor);
     presentation.setOpenIcon(myOpenIcon);
     presentation.setClosedIcon(myClosedIcon);
-  }
-
-  private Color getDefaultForeground() {
-    return EditorColorsManager.getInstance().getGlobalScheme().getDefaultForeground();
   }
 
   protected void updateFileStatus() {

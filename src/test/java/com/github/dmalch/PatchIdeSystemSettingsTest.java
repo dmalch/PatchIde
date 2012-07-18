@@ -8,6 +8,7 @@ import org.mockito.Mock;
 
 import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.util.ui.ThreeStateCheckBox.State.*;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyBoolean;
@@ -116,6 +117,7 @@ public class PatchIdeSystemSettingsTest {
     private void whenUserAppliesPatch() throws ConfigurationException {
         patchIdeSystemSettings.reset();
         patchIdeSystemSettings.getShouldPatchIdea().setState(SELECTED);
+        assertThat(patchIdeSystemSettings.isModified(), is(true));
         patchIdeSystemSettings.apply();
     }
 

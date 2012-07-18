@@ -21,7 +21,11 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
     private PatchIdePatcher patcher = new PatchIdePatcherImpl();
 
     public PatchIdeApplicationComponent() {
-        patcher.setFilesToPatch(ImmutableMap.of("com/intellij/ui/treeStructure/Tree.class", new PatchTarget("com/intellij/ui/treeStructure", "../lib/openapi.jar")));
+        final ImmutableMap.Builder<String, PatchTarget> builder = new ImmutableMap.Builder<String, PatchTarget>();
+        builder.put("com/intellij/ui/treeStructure/SimpleNode.class", new PatchTarget("com/intellij/ui/treeStructure", "../lib/openapi.jar"));
+        builder.put("com/intellij/ide/util/treeView/PresentableNodeDescriptor.class", new PatchTarget("com/intellij/ide/util/treeView", "../lib/openapi.jar"));
+        builder.put("com/intellij/util/ui/UIUtil.class", new PatchTarget("com/intellij/util/ui", "../lib/util.jar"));
+        patcher.setFilesToPatch(builder.build());
     }
 
     public void initComponent() {
@@ -29,14 +33,15 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
             if (userWantsToPatchClasses()) {
                 userHasAcceptedPatching();
                 patcher.applyPatch();
+                doNotShowPatchDialogAnyMore();
                 applicationRestarter.restart();
             } else {
                 userHasRejectedPatching();
                 if (patcher.applyRollback()) {
+                    doNotShowPatchDialogAnyMore();
                     applicationRestarter.restart();
                 }
             }
-            doNotShowPatchDialogAnyMore();
         }
     }
 

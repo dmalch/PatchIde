@@ -11,7 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="org.mockito:mockito-all:1.9.5-rc1" level="project" />
+    <orderEntry type="library" scope="TEST" name="org.mockito:mockito-all:1.9.5-rc1" level="project" />
     <orderEntry type="library" name="de.schlichtherle.truezip:truezip-driver-zip:7.5.5" level="project" />
     <orderEntry type="library" name="de.schlichtherle.truezip:truezip-file:7.5.5" level="project" />
     <orderEntry type="library" name="commons-io:commons-io:2.4" level="project" />

@@ -27,7 +27,7 @@ public class PatchIdeSystemSettings implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "Color IDE";
+        return "Patch IDE";
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PatchIdeSystemSettings implements Configurable {
 
     @Override
     public boolean isModified() {
-        return Objects.equal(shouldPatchIdea.getState(), initialState);
+        return !Objects.equal(shouldPatchIdea.getState(), initialState);
     }
 
     @Override
