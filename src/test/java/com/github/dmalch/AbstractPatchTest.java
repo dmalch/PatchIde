@@ -1,12 +1,11 @@
 package com.github.dmalch;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import de.schlichtherle.truezip.file.TFileReader;
-import org.apache.commons.io.IOUtils;
+import de.schlichtherle.truezip.file.TFileInputStream;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 
 import static com.google.common.io.Closeables.closeQuietly;
 import static java.text.MessageFormat.format;
@@ -25,16 +24,16 @@ public class AbstractPatchTest {
         return copiedFile;
     }
 
-    protected String readFileContent(final File file) {
-        final String fileContent;
-        Reader reader = null;
+    protected byte[] readFileContent(final File file) {
+        final byte[] fileContent;
+        TFileInputStream inputStream = null;
         try {
-            reader = new TFileReader(file);
-            fileContent = IOUtils.toString(reader);
+            inputStream = new TFileInputStream(file);
+            fileContent = ByteStreams.toByteArray(inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            closeQuietly(reader);
+            closeQuietly(inputStream);
         }
         return fileContent;
     }

@@ -53,8 +53,8 @@ public class JarUtilsTest extends AbstractPatchTest {
     }
 
     private void thenFileIsInJarFile(final File expectedFile, final File jarFile, final String dir) {
-        final String actual = readFileContent(new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dir, expectedFile.getName())));
-        final String expected = readFileContent(new File(expectedFile.getAbsolutePath()));
+        final byte[] actual = readFileContent(new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dir, expectedFile.getName())));
+        final byte[] expected = readFileContent(new File(expectedFile.getAbsolutePath()));
 
         assertThat(actual, equalTo(expected));
     }

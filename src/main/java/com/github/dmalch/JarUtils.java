@@ -1,13 +1,14 @@
 package com.github.dmalch;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileReader;
-import de.schlichtherle.truezip.file.TFileWriter;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TFileOutputStream;
 import de.schlichtherle.truezip.file.TVFS;
-import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 import static java.text.MessageFormat.format;
 
@@ -19,17 +20,17 @@ public class JarUtils {
     }
 
     public static void extractFromJar(final File fileNew, final TFile jarEntry) {
-        TFileWriter writer = null;
-        TFileReader reader = null;
+        TFileOutputStream outputStream = null;
+        TFileInputStream inputStream = null;
         try {
-            reader = new TFileReader(jarEntry);
-            writer = new TFileWriter(fileNew);
+            outputStream = new TFileOutputStream(fileNew);
+            inputStream = new TFileInputStream(jarEntry);
 
-            IOUtils.copy(reader, writer);
+            ByteStreams.copy(inputStream, outputStream);
         } catch (Exception ignored) {
         } finally {
-            Closeables.closeQuietly(writer);
-            Closeables.closeQuietly(reader);
+            Closeables.closeQuietly(outputStream);
+            Closeables.closeQuietly(inputStream);
         }
     }
 
@@ -38,18 +39,18 @@ public class JarUtils {
     }
 
     private static void createNewFile(final File patchFilePath, final TFile jar) {
-        TFileReader input = null;
-        TFileWriter writer = null;
+        TFileInputStream inputStream = null;
+        TFileOutputStream outputStream = null;
         try {
-            writer = new TFileWriter(jar);
-            input = new TFileReader(patchFilePath);
+            inputStream = new TFileInputStream(patchFilePath);
+            outputStream = new TFileOutputStream(jar);
 
-            IOUtils.copy(input, writer);
+            ByteStreams.copy(inputStream, outputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            Closeables.closeQuietly(input);
-            Closeables.closeQuietly(writer);
+            Closeables.closeQuietly(inputStream);
+            Closeables.closeQuietly(outputStream);
         }
     }
 

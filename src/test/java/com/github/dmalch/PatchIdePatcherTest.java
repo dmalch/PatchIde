@@ -31,7 +31,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     public void testRollbackFileIsCreatedWhenPatchIsApplied() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
-        final String expectedFileValue = readFileContent(zipFileToPatch);
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
@@ -44,7 +44,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     public void testApplyRollbackWhenFilesWerePatched() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
-        final String expectedFileValue = readFileContent(zipFileToPatch);
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
@@ -59,7 +59,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     public void testApplyRollbackWhenNoPatchWasApplied() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
-        final String expectedFileValue = readFileContent(zipFileToPatch);
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
@@ -73,7 +73,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     public void testApplyRollbackWhenPatchedFilesWereChangedToOriginal() throws Exception {
         final File patchFile = givenPatchFile("");
         final TFile zipFileToPatch = givenZipFileToPatch("");
-        final String expectedFileValue = readFileContent(zipFileToPatch);
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
 
@@ -131,15 +131,15 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         assertThat(result, is(true));
     }
 
-    private void thenRollbackFileIsCreated(final TFile zipFileToPatch, final String expectedFileValue) {
+    private void thenRollbackFileIsCreated(final TFile zipFileToPatch, final byte[] expectedFileValue) {
         final String absolutePath = format("{0}/{1}.bak", zipFileToPatch.getInnerArchive().getParent(), zipFileToPatch.getEnclEntryName());
-        final String backupFileContent = readFileContent(new File(absolutePath));
+        final byte[] backupFileContent = readFileContent(new File(absolutePath));
 
         assertThat(backupFileContent, equalTo(expectedFileValue));
     }
 
-    private void thenRollbackIsApplied(final TFile zipFileToPatch, final String expectedFileValue) {
-        final String fileToPatchValue = readFileContent(zipFileToPatch);
+    private void thenRollbackIsApplied(final TFile zipFileToPatch, final byte[] expectedFileValue) {
+        final byte[] fileToPatchValue = readFileContent(zipFileToPatch);
 
         assertThat(fileToPatchValue, equalTo(expectedFileValue));
     }
@@ -154,8 +154,8 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     private void thenPatchIsApplied(final File zipFileToPatch, final File expectedFile) {
 
-        final String expectedFileValue = readFileContent(expectedFile);
-        final String fileToPatchValue = readFileContent(zipFileToPatch);
+        final byte[] expectedFileValue = readFileContent(expectedFile);
+        final byte[] fileToPatchValue = readFileContent(zipFileToPatch);
 
         assertThat(fileToPatchValue, equalTo(expectedFileValue));
     }

@@ -9,7 +9,6 @@ import de.schlichtherle.truezip.file.TFileInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.zip.CRC32;
 
@@ -25,8 +24,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         for (final String patchFilePath : filesToPatch.keySet()) {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
-            final URI uri = getPatchFileURI(patchFilePath);
-            final TFile patchFile = new TFile(uri);
+            final TFile patchFile = getPatchFile(patchFilePath);
 
             final String targetFileName = patchFile.getName();
 
@@ -36,6 +34,11 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
             JarUtils.extractFromJar(bakFile(patchFile, jarFile), jarEntry);
             JarUtils.putIntoJar(patchFile, jarEntry);
         }
+    }
+
+    private TFile getPatchFile(final String patchFilePath) {
+        final URI uri = getPatchFileURI(patchFilePath);
+        return new TFile(uri);
     }
 
     private URI getPatchFileURI(final String patchFilePath) {
@@ -54,7 +57,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         for (final String patchFilePath : filesToPatch.keySet()) {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
-            final File patchFile = new File(patchFilePath);
+            final TFile patchFile = getPatchFile(patchFilePath);
 
             final String targetFileName = patchFile.getName();
 

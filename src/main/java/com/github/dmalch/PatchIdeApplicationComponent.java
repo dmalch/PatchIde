@@ -24,7 +24,6 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
         final ImmutableMap.Builder<String, PatchTarget> builder = new ImmutableMap.Builder<String, PatchTarget>();
         builder.put("com/intellij/ui/treeStructure/SimpleNode.class", new PatchTarget("com/intellij/ui/treeStructure", "../lib/openapi.jar"));
         builder.put("com/intellij/ide/util/treeView/PresentableNodeDescriptor.class", new PatchTarget("com/intellij/ide/util/treeView", "../lib/openapi.jar"));
-        builder.put("com/intellij/util/ui/UIUtil.class", new PatchTarget("com/intellij/util/ui", "../lib/util.jar"));
         patcher.setFilesToPatch(builder.build());
     }
 
@@ -37,8 +36,8 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
                 applicationRestarter.restart();
             } else {
                 userHasRejectedPatching();
+                doNotShowPatchDialogAnyMore();
                 if (patcher.applyRollback()) {
-                    doNotShowPatchDialogAnyMore();
                     applicationRestarter.restart();
                 }
             }
