@@ -30,6 +30,12 @@ public class RevisionManagerTest {
 
         givenCurrentRevision("5.2");
         thenCurrentRevisionIsGreaterOrEqualThan("4.1");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsGreaterOrEqualThan("");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsGreaterOrEqualThan(null);
     }
 
     @Test
