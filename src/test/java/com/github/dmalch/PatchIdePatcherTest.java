@@ -47,6 +47,21 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
+    public void testPatchIsNotAppliedWhenIdeRevisionIsLowerThanRequired() throws Exception {
+        final File expectedFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
+
+        final String fileMinRevision = "5";
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, zipFileToPatch, "", fileMinRevision);
+        when(revisionManager.isCurrentVersionGreaterThen(fileMinRevision)).thenReturn(false);
+
+        whenApplyPatch(patcher);
+
+        thenPatchIsNotApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
     public void testRollbackFileIsCreatedWhenPatchIsApplied() throws Exception {
         final File patchFile = givenPatchFile();
         final TFile zipFileToPatch = givenZipFileToPatch();
@@ -131,7 +146,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
-    public void testPatchIsNotAppliedWhenIdeRevisionIsLowerThanRequired() throws Exception {
+    public void testCheckModificationsDoesNotCheckFilesWithMinRevisionHigherThanRequired() throws Exception {
         final File patchFile = givenPatchFile();
         final TFile zipFileToPatch = givenZipFileToPatch();
 
@@ -139,11 +154,9 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "", fileMinRevision);
         when(revisionManager.isCurrentVersionGreaterThen(fileMinRevision)).thenReturn(false);
 
-        whenApplyPatch(patcher);
-
         final boolean result = whenCheckFilesArePatched(patcher);
 
-        thenFilesWereNotPatched(result);
+        thenFilesWerePatched(result);
     }
 
     private PatchIdePatcher givenPatcherFor(final File patchFile, final TFile zipFileToPatch) {
@@ -186,6 +199,10 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     private void thenRollbackIsApplied(final TFile zipFileToPatch, final byte[] expectedFileValue) {
+        thenPatchIsNotApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    private void thenPatchIsNotApplied(final TFile zipFileToPatch, final byte[] expectedFileValue) {
         final byte[] fileToPatchValue = readFileContent(zipFileToPatch);
 
         assertThat(fileToPatchValue, equalTo(expectedFileValue));

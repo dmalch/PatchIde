@@ -61,15 +61,18 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         for (final String patchFilePath : filesToPatch.keySet()) {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
-            final TFile patchFile = getPatchFile(patchFilePath);
 
-            final String targetFileName = patchFile.getName();
+            if (revisionManager.isCurrentVersionGreaterThen(patchTarget.getMinRevision())) {
+                final TFile patchFile = getPatchFile(patchFilePath);
 
-            final File jarFile = new File(patchTarget.getPathToArchive());
-            final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                final String targetFileName = patchFile.getName();
 
-            if (filesAreDifferent(patchFile, jarEntry)) {
-                filesArePatched = false;
+                final File jarFile = new File(patchTarget.getPathToArchive());
+                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+
+                if (filesAreDifferent(patchFile, jarEntry)) {
+                    filesArePatched = false;
+                }
             }
         }
 
