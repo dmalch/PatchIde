@@ -1,6 +1,7 @@
 package com.github.dmalch;
 
 import com.google.common.base.Objects;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.ThreeStateCheckBox;
@@ -45,6 +46,7 @@ public class PatchIdeSystemSettings implements Configurable {
     }
 
     private boolean filesArePatched() {
+        ApplicationManager.getApplication().getComponent("com.github.dmalch.PatchIdeApplicationComponent");
         return patcher.checkFilesArePatched();
     }
 

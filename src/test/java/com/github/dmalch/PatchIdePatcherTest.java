@@ -3,7 +3,11 @@ package com.github.dmalch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import de.schlichtherle.truezip.file.TFile;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,14 +17,29 @@ import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class PatchIdePatcherTest extends AbstractPatchTest {
+
+    @Spy
+    @InjectMocks
+    private PatchIdePatcher idePatcher = new PatchIdePatcherImpl();
+
+    @Mock
+    private RevisionManager revisionManager;
+
+    @Before
+    public void setUp() throws Exception {
+        initMocks(this);
+    }
+
     @Test
     public void testApplyPatchAtTheSpecifiedDirectory() throws Exception {
         final String expectedDir = givenExpectedDir();
         final File expectedFile = givenPatchFile(expectedDir);
         final TFile zipFileToPatch = givenZipFileToPatch(expectedDir);
-        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, zipFileToPatch, expectedDir);
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, zipFileToPatch, expectedDir, "");
 
         whenApplyPatch(patcher);
 
@@ -29,11 +48,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testRollbackFileIsCreatedWhenPatchIsApplied() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
         final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         whenApplyPatch(patcher);
 
@@ -42,11 +61,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testApplyRollbackWhenFilesWerePatched() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
         final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         whenApplyPatch(patcher);
         final boolean result = whenApplyRollback(patcher);
@@ -57,11 +76,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testApplyRollbackWhenNoPatchWasApplied() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
         final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         final boolean result = whenApplyRollback(patcher);
 
@@ -71,11 +90,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testApplyRollbackWhenPatchedFilesWereChangedToOriginal() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
         final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         whenApplyPatch(patcher);
         whenApplyRollback(patcher);
@@ -87,10 +106,10 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testCheckModificationsWhenNoFilesChanged() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         final boolean result = whenCheckFilesArePatched(patcher);
 
@@ -99,16 +118,44 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     @Test
     public void testCheckModificationsWhenFilesWereActuallyChanged() throws Exception {
-        final File patchFile = givenPatchFile("");
-        final TFile zipFileToPatch = givenZipFileToPatch("");
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
 
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "");
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
 
         whenApplyPatch(patcher);
 
         final boolean result = whenCheckFilesArePatched(patcher);
 
         thenFilesWerePatched(result);
+    }
+
+    @Test
+    public void testPatchIsNotAppliedWhenIdeRevisionIsLowerThanRequired() throws Exception {
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
+
+        final String fileMinRevision = "5";
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch, "", fileMinRevision);
+        when(revisionManager.isCurrentVersionGreaterThen(fileMinRevision)).thenReturn(false);
+
+        whenApplyPatch(patcher);
+
+        final boolean result = whenCheckFilesArePatched(patcher);
+
+        thenFilesWereNotPatched(result);
+    }
+
+    private PatchIdePatcher givenPatcherFor(final File patchFile, final TFile zipFileToPatch) {
+        return givenPatcherFor(patchFile, zipFileToPatch, "", "");
+    }
+
+    private TFile givenZipFileToPatch() {
+        return givenZipFileToPatch("");
+    }
+
+    private File givenPatchFile() {
+        return givenPatchFile("");
     }
 
     private void thenFilesWerePatched(final boolean result) {
@@ -172,15 +219,16 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         return new TFile(fileToPatch, format("{0}/file.txt", expectedDir));
     }
 
-    private PatchIdePatcher givenPatcherFor(final File expectedFile, final TFile zipFileToPatch, final String innerDirectory) {
-        final PatchIdePatcherImpl patchIdePatcher = new PatchIdePatcherImpl();
-        patchIdePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(zipFileToPatch.getInnerArchive().getAbsolutePath(), innerDirectory)));
+    private PatchIdePatcher givenPatcherFor(final File expectedFile, final TFile zipFileToPatch, final String innerDirectory, final String minimalRevision) {
+        idePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(zipFileToPatch.getInnerArchive().getAbsolutePath(), innerDirectory, minimalRevision)));
         new File("out/test/file.txt.bak").delete();
-        return patchIdePatcher;
+
+        when(revisionManager.isCurrentVersionGreaterThen(minimalRevision)).thenReturn(true);
+        return idePatcher;
     }
 
-    private PatchTarget patchTarget(final String pathToArchive, final String innerDir) {
-        return new PatchTarget(innerDir, pathToArchive);
+    private PatchTarget patchTarget(final String pathToArchive, final String innerDir, final String minimalRevision) {
+        return new PatchTarget(innerDir, pathToArchive, minimalRevision);
     }
 
     private void whenApplyPatch(final PatchIdePatcher patcher) {

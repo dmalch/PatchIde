@@ -18,21 +18,25 @@ import static java.text.MessageFormat.format;
 
 public class PatchIdePatcherImpl implements PatchIdePatcher {
     private final Map<String, PatchTarget> filesToPatch = newHashMap();
+    private RevisionManager revisionManager = new RevisionManagerImpl();
 
     @Override
     public void applyPatch() {
         for (final String patchFilePath : filesToPatch.keySet()) {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
-            final TFile patchFile = getPatchFile(patchFilePath);
 
-            final String targetFileName = patchFile.getName();
+            if (revisionManager.isCurrentVersionGreaterThen(patchTarget.getMinRevision())) {
+                final TFile patchFile = getPatchFile(patchFilePath);
 
-            final File jarFile = new File(patchTarget.getPathToArchive());
-            final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                final String targetFileName = patchFile.getName();
 
-            JarUtils.extractFromJar(bakFile(patchFile, jarFile), jarEntry);
-            JarUtils.putIntoJar(patchFile, jarEntry);
+                final File jarFile = new File(patchTarget.getPathToArchive());
+                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+
+                JarUtils.extractFromJar(bakFile(patchFile, jarFile), jarEntry);
+                JarUtils.putIntoJar(patchFile, jarEntry);
+            }
         }
     }
 
@@ -131,5 +135,9 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
     @Override
     public void setFilesToPatch(final ImmutableMap<String, PatchTarget> filesToPatch) {
         this.filesToPatch.putAll(filesToPatch);
+    }
+
+    public void setRevisionManager(final RevisionManager revisionManager) {
+        this.revisionManager = revisionManager;
     }
 }
