@@ -106,7 +106,7 @@ public class PatchIdeSystemSettings implements Configurable {
 
     public PatchIdeApplicationComponent getPatchIdeApplicationComponent() {
         if (patchIdeApplicationComponent == null) {
-            patchIdeApplicationComponent = (PatchIdeApplicationComponent) ApplicationManager.getApplication().getComponent("com.github.dmalch.PatchIdeApplicationComponent");
+            patchIdeApplicationComponent = ApplicationManager.getApplication().getComponent(PatchIdeApplicationComponent.class);
         }
         return patchIdeApplicationComponent;
     }

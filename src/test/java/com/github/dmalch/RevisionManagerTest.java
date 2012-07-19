@@ -31,6 +31,9 @@ public class RevisionManagerTest {
         givenCurrentRevision("5.2");
         thenCurrentRevisionIsGreaterOrEqualThan("4.1");
 
+        givenCurrentRevision("PS-5.2");
+        thenCurrentRevisionIsGreaterOrEqualThan("4.1");
+
         givenCurrentRevision("5.2");
         thenCurrentRevisionIsGreaterOrEqualThan("");
 
@@ -45,6 +48,9 @@ public class RevisionManagerTest {
 
         givenCurrentRevision("5.2");
         thenCurrentRevisionIsGreaterOrEqualThan("5.2");
+
+        givenCurrentRevision("PS-5.2");
+        thenCurrentRevisionIsGreaterOrEqualThan("5.2");
     }
 
     @Test
@@ -56,6 +62,9 @@ public class RevisionManagerTest {
         thenCurrentRevisionIsLowerThan("5.2");
 
         givenCurrentRevision("5.1");
+        thenCurrentRevisionIsLowerThan("6.2");
+
+        givenCurrentRevision("PS-5.1");
         thenCurrentRevisionIsLowerThan("6.2");
     }
 
