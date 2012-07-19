@@ -23,6 +23,9 @@ public class PatchIdeSystemSettingsTest {
     private PatchIdeSystemSettings patchIdeSystemSettings;
 
     @Mock
+    private PatchIdeApplicationComponent patchIdeApplicationComponent;
+
+    @Mock
     private PersistenceManager persistenceManager;
 
     @Mock
@@ -34,6 +37,7 @@ public class PatchIdeSystemSettingsTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
+        when(patchIdeApplicationComponent.getPatcher()).thenReturn(patcher);
     }
 
     @Test

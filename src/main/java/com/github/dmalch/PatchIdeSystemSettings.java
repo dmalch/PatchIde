@@ -17,9 +17,9 @@ public class PatchIdeSystemSettings implements Configurable {
     private JLabel headerText;
     private ThreeStateCheckBox shouldPatchIdea;
 
-    private PersistenceManager persistenceManager = new PersistenceManagerImpl();
+    private PatchIdeApplicationComponent patchIdeApplicationComponent;
 
-    private PatchIdePatcher patcher = new PatchIdePatcherImpl();
+    private PersistenceManager persistenceManager = new PersistenceManagerImpl();
 
     private ApplicationRestarter restarter = new ApplicationRestarterImpl();
 
@@ -46,8 +46,12 @@ public class PatchIdeSystemSettings implements Configurable {
     }
 
     private boolean filesArePatched() {
-        ApplicationManager.getApplication().getComponent("com.github.dmalch.PatchIdeApplicationComponent");
+        final PatchIdePatcher patcher = getPatcher();
         return patcher.checkFilesArePatched();
+    }
+
+    private PatchIdePatcher getPatcher() {
+        return getPatchIdeApplicationComponent().getPatcher();
     }
 
     @Override
@@ -59,11 +63,11 @@ public class PatchIdeSystemSettings implements Configurable {
     public void apply() throws ConfigurationException {
         if (Objects.equal(shouldPatchIdea.getState(), SELECTED)) {
             userHasAcceptedPatching();
-            patcher.applyPatch();
+            getPatcher().applyPatch();
             restarter.askToRestart();
         } else if (Objects.equal(shouldPatchIdea.getState(), NOT_SELECTED)) {
             userHasRejectedPatching();
-            patcher.applyRollback();
+            getPatcher().applyRollback();
             restarter.askToRestart();
         }
     }
@@ -100,8 +104,11 @@ public class PatchIdeSystemSettings implements Configurable {
         return shouldPatchIdea;
     }
 
-    public void setPatcher(final PatchIdePatcher patcher) {
-        this.patcher = patcher;
+    public PatchIdeApplicationComponent getPatchIdeApplicationComponent() {
+        if (patchIdeApplicationComponent == null) {
+            patchIdeApplicationComponent = (PatchIdeApplicationComponent) ApplicationManager.getApplication().getComponent("com.github.dmalch.PatchIdeApplicationComponent");
+        }
+        return patchIdeApplicationComponent;
     }
 
     public void setPersistenceManager(final PersistenceManager persistenceManager) {
@@ -110,5 +117,9 @@ public class PatchIdeSystemSettings implements Configurable {
 
     public void setRestarter(final ApplicationRestarter restarter) {
         this.restarter = restarter;
+    }
+
+    public void setPatchIdeApplicationComponent(final PatchIdeApplicationComponent patchIdeApplicationComponent) {
+        this.patchIdeApplicationComponent = patchIdeApplicationComponent;
     }
 }
