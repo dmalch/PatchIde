@@ -75,6 +75,20 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     @Test
+    public void testRollbackFileIsNotOverwrittenWhenPatchIsAppliedTwice() throws Exception {
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
+
+        whenApplyPatch(patcher);
+        whenApplyPatch(patcher);
+
+        thenRollbackFileIsCreated(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
     public void testApplyRollbackWhenFilesWerePatched() throws Exception {
         final File patchFile = givenPatchFile();
         final TFile zipFileToPatch = givenZipFileToPatch();

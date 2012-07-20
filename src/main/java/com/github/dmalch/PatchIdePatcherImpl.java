@@ -34,7 +34,10 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                 final File jarFile = new File(patchTarget.getPathToArchive());
                 final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-                JarUtils.extractFromJar(bakFile(patchFile, jarFile), jarEntry);
+                final File bakFile = bakFile(patchFile, jarFile);
+                if (!bakFile.exists()) {
+                    JarUtils.extractFromJar(bakFile, jarEntry);
+                }
                 JarUtils.putIntoJar(patchFile, jarEntry);
             }
         }
