@@ -220,6 +220,20 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         thenFilesWerePatched(result);
     }
 
+    @Test
+    public void testCheckModificationsDoesNotCheckFilesWithMaxRevisionLowerThanRequired() throws Exception {
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
+
+        final String fileMaxRevision = "5";
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch), "", "", fileMaxRevision);
+        when(revisionManager.isCurrentVersionLowerThen(fileMaxRevision)).thenReturn(false);
+
+        final boolean result = whenCheckFilesArePatched(patcher);
+
+        thenFilesWerePatched(result);
+    }
+
     private TFile givenZipFileToPatch() {
         return givenZipFileToPatch("");
     }
@@ -302,7 +316,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     private PatchIdePatcher givenPatcherFor(final File expectedFile, final Collection<TFile> zipFilesToPatch, final String innerDirectory, final String minimalRevision, final String maximumRevision) {
-        idePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(innerDirectory, transform(zipFilesToPatch, extractArchivePath()), minimalRevision)));
+        idePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(innerDirectory, transform(zipFilesToPatch, extractArchivePath()), minimalRevision, maximumRevision)));
         new File("out/test/file.txt.bak").delete();
 
         when(revisionManager.isCurrentVersionGreaterThen(minimalRevision)).thenReturn(true);
@@ -319,13 +333,13 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         };
     }
 
-    private PatchTarget patchTarget(final String innerDir, final String pathToArchive, final String minimalRevision) {
-        return new PatchTarget(innerDir, pathToArchive, minimalRevision, "");
+    private PatchTarget patchTarget(final String innerDir, final String pathToArchive, final String minimalRevision, final String maximumRevision) {
+        return new PatchTarget(innerDir, pathToArchive, minimalRevision, maximumRevision);
     }
 
 
-    private PatchTarget patchTarget(final String innerDir, final Collection<String> pathToArchives, final String minimalRevision) {
-        return new PatchTarget(innerDir, pathToArchives, minimalRevision, "");
+    private PatchTarget patchTarget(final String innerDir, final Collection<String> pathToArchives, final String minimalRevision, final String maximumRevision) {
+        return new PatchTarget(innerDir, pathToArchives, minimalRevision, maximumRevision);
     }
 
     private void whenApplyPatch(final PatchIdePatcher patcher) {
