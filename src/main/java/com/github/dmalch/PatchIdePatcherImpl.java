@@ -26,7 +26,8 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
             final PatchTarget patchTarget = filesToPatch.get(patchFilePath);
 
-            if (revisionManager.isCurrentVersionGreaterThen(patchTarget.getMinRevision())) {
+            if (revisionManager.isCurrentVersionGreaterThen(patchTarget.getMinRevision()) &&
+                    revisionManager.isCurrentVersionLowerThen(patchTarget.getMaxRevision())) {
                 final TFile patchFile = getPatchFile(patchFilePath);
 
                 final String targetFileName = patchFile.getName();

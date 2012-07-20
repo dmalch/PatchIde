@@ -44,7 +44,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         final String expectedDir = givenExpectedDir();
         final File expectedFile = givenPatchFile(expectedDir);
         final TFile zipFileToPatch = givenZipFileToPatch(expectedDir);
-        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, ImmutableList.of(zipFileToPatch), expectedDir, "");
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, ImmutableList.of(zipFileToPatch), expectedDir, "", "");
 
         whenApplyPatch(patcher);
 
@@ -58,8 +58,23 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         final byte[] expectedFileValue = readFileContent(zipFileToPatch);
 
         final String fileMinRevision = "5";
-        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, ImmutableList.of(zipFileToPatch), "", fileMinRevision);
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, ImmutableList.of(zipFileToPatch), "", fileMinRevision, "");
         when(revisionManager.isCurrentVersionGreaterThen(fileMinRevision)).thenReturn(false);
+
+        whenApplyPatch(patcher);
+
+        thenPatchIsNotApplied(zipFileToPatch, expectedFileValue);
+    }
+
+    @Test
+    public void testPatchIsNotAppliedWhenIdeRevisionIsHigherThanMaximux() throws Exception {
+        final File expectedFile = givenPatchFile();
+        final TFile zipFileToPatch = givenZipFileToPatch();
+        final byte[] expectedFileValue = readFileContent(zipFileToPatch);
+
+        final String fileMaxRevision = "5";
+        final PatchIdePatcher patcher = givenPatcherFor(expectedFile, ImmutableList.of(zipFileToPatch), "", "", fileMaxRevision);
+        when(revisionManager.isCurrentVersionLowerThen(fileMaxRevision)).thenReturn(false);
 
         whenApplyPatch(patcher);
 
@@ -197,7 +212,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         final TFile zipFileToPatch = givenZipFileToPatch();
 
         final String fileMinRevision = "5";
-        final PatchIdePatcher patcher = givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch), "", fileMinRevision);
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch), "", fileMinRevision, "");
         when(revisionManager.isCurrentVersionGreaterThen(fileMinRevision)).thenReturn(false);
 
         final boolean result = whenCheckFilesArePatched(patcher);
@@ -267,11 +282,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     private PatchIdePatcher givenPatcherFor(final File patchFile, final TFile zipFileToPatch) {
-        return givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch), "", "");
+        return givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch), "", "", "");
     }
 
     private PatchIdePatcher givenPatcherFor(final File patchFile, final TFile zipFileToPatch1, final TFile zipFileToPatch2) {
-        return givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch1, zipFileToPatch2), "", "");
+        return givenPatcherFor(patchFile, ImmutableList.of(zipFileToPatch1, zipFileToPatch2), "", "", "");
     }
 
     private TFile givenZipFileToPatch(final String expectedDir) {
@@ -286,11 +301,12 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         return new TFile(fileToPatch, format("{0}/file.txt", expectedDir));
     }
 
-    private PatchIdePatcher givenPatcherFor(final File expectedFile, final Collection<TFile> zipFilesToPatch, final String innerDirectory, final String minimalRevision) {
+    private PatchIdePatcher givenPatcherFor(final File expectedFile, final Collection<TFile> zipFilesToPatch, final String innerDirectory, final String minimalRevision, final String maximumRevision) {
         idePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(innerDirectory, transform(zipFilesToPatch, extractArchivePath()), minimalRevision)));
         new File("out/test/file.txt.bak").delete();
 
         when(revisionManager.isCurrentVersionGreaterThen(minimalRevision)).thenReturn(true);
+        when(revisionManager.isCurrentVersionLowerThen(maximumRevision)).thenReturn(true);
         return idePatcher;
     }
 
@@ -304,12 +320,12 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     private PatchTarget patchTarget(final String innerDir, final String pathToArchive, final String minimalRevision) {
-        return new PatchTarget(innerDir, pathToArchive, minimalRevision);
+        return new PatchTarget(innerDir, pathToArchive, minimalRevision, "");
     }
 
 
     private PatchTarget patchTarget(final String innerDir, final Collection<String> pathToArchives, final String minimalRevision) {
-        return new PatchTarget(innerDir, pathToArchives, minimalRevision);
+        return new PatchTarget(innerDir, pathToArchives, minimalRevision, "");
     }
 
     private void whenApplyPatch(final PatchIdePatcher patcher) {

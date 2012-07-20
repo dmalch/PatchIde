@@ -42,7 +42,28 @@ public class RevisionManagerTest {
     }
 
     @Test
-    public void testIsCurrentRevisionEqiualThenMinimal() throws Exception {
+    public void testIsCurrentRevisionLowerThenMaximal() throws Exception {
+        givenCurrentRevision("5");
+        thenCurrentRevisionIsLowerThan("6");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsLowerThan("5.3");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsLowerThan("6.1");
+
+        givenCurrentRevision("PS-5.2");
+        thenCurrentRevisionIsLowerThan("6.1");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsLowerThan("");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsLowerThan(null);
+    }
+
+    @Test
+    public void testIsCurrentRevisionEqualToMinimal() throws Exception {
         givenCurrentRevision("5");
         thenCurrentRevisionIsGreaterOrEqualThan("5");
 
@@ -51,6 +72,18 @@ public class RevisionManagerTest {
 
         givenCurrentRevision("PS-5.2");
         thenCurrentRevisionIsGreaterOrEqualThan("5.2");
+    }
+
+    @Test
+    public void testIsCurrentRevisionEqualToMaximax() throws Exception {
+        givenCurrentRevision("5");
+        thenCurrentRevisionIsNotLowerThan("5");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsNotLowerThan("5.2");
+
+        givenCurrentRevision("PS-5.2");
+        thenCurrentRevisionIsNotLowerThan("5.2");
     }
 
     @Test
@@ -68,7 +101,22 @@ public class RevisionManagerTest {
         thenCurrentRevisionIsLowerThan("6.2");
     }
 
-    private void thenCurrentRevisionIsLowerThan(final String minimalVersion) {
+    @Test
+    public void testIsCurrentRevisionHigherThenMaximal() throws Exception {
+        givenCurrentRevision("5");
+        thenCurrentRevisionIsNotLowerThan("4");
+
+        givenCurrentRevision("5.2");
+        thenCurrentRevisionIsNotLowerThan("5.1");
+
+        givenCurrentRevision("5.1");
+        thenCurrentRevisionIsNotLowerThan("4.2");
+
+        givenCurrentRevision("PS-5.1");
+        thenCurrentRevisionIsNotLowerThan("4.2");
+    }
+
+    private void thenCurrentRevisionIsNotGreaterThan(final String minimalVersion) {
         final Boolean currentVersionGreaterThen = revisionManager.isCurrentVersionGreaterThen(minimalVersion);
 
         assertThat(currentVersionGreaterThen, is(false));
@@ -76,6 +124,18 @@ public class RevisionManagerTest {
 
     private void thenCurrentRevisionIsGreaterOrEqualThan(final String minimalVersion) {
         final Boolean currentVersionGreaterThen = revisionManager.isCurrentVersionGreaterThen(minimalVersion);
+
+        assertThat(currentVersionGreaterThen, is(true));
+    }
+
+    private void thenCurrentRevisionIsNotLowerThan(final String maximumlVersion) {
+        final Boolean currentVersionGreaterThen = revisionManager.isCurrentVersionLowerThen(maximumlVersion);
+
+        assertThat(currentVersionGreaterThen, is(false));
+    }
+
+    private void thenCurrentRevisionIsLowerThan(final String maximumlVersion) {
+        final Boolean currentVersionGreaterThen = revisionManager.isCurrentVersionLowerThen(maximumlVersion);
 
         assertThat(currentVersionGreaterThen, is(true));
     }
