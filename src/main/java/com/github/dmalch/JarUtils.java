@@ -6,6 +6,7 @@ import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
 import de.schlichtherle.truezip.file.TVFS;
+import de.schlichtherle.truezip.fs.FsSyncException;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class JarUtils {
             Closeables.closeQuietly(outputStream);
             Closeables.closeQuietly(inputStream);
         }
+        unmount();
     }
 
     public static TFile jarFile(final File jarFile, final String dirInJar, final String targetFileName) {
@@ -52,13 +54,21 @@ public class JarUtils {
             Closeables.closeQuietly(inputStream);
             Closeables.closeQuietly(outputStream);
         }
+        unmount();
     }
 
     private static void removeObsoleteFile(final TFile jar) {
         try {
             jar.rm();
-            TVFS.umount();
+            unmount();
         } catch (IOException ignored) {
+        }
+    }
+
+    private static void unmount() {
+        try {
+            TVFS.umount();
+        } catch (FsSyncException ignored) {
         }
     }
 }
