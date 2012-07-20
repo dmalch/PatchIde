@@ -1,6 +1,7 @@
 package com.github.dmalch;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public class PatchIdeApplicationComponent implements ApplicationComponent {
         final ImmutableMap.Builder<String, PatchTarget> builder = new ImmutableMap.Builder<String, PatchTarget>();
         builder.put("com/intellij/ui/treeStructure/SimpleNode.class", new PatchTarget("com/intellij/ui/treeStructure", "../lib/openapi.jar", ""));
         builder.put("com/intellij/ide/util/treeView/PresentableNodeDescriptor.class", new PatchTarget("com/intellij/ide/util/treeView", "../lib/openapi.jar", ""));
-        builder.put("com/intellij/ide/projectView/impl/ProjectViewTree.class", new PatchTarget("com/intellij/ide/projectView/impl", "../lib/webide.jar", "118.308"));
+        builder.put("com/intellij/ide/projectView/impl/ProjectViewTree.class", new PatchTarget("com/intellij/ide/projectView/impl", ImmutableList.of("../lib/webide.jar", "../lib/idea.jar"), "118.308"));
         patcher.setFilesToPatch(builder.build());
     }
 

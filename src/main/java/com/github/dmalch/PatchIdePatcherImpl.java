@@ -31,14 +31,18 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
                 final String targetFileName = patchFile.getName();
 
-                final File jarFile = new File(patchTarget.getPathToArchive());
-                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                for (final String pathToArchive : patchTarget.getPathToArchives()) {
+                    final File jarFile = new File(pathToArchive);
+                    if (jarFile.exists()) {
+                        final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-                final File bakFile = bakFile(patchFile, jarFile);
-                if (!bakFile.exists()) {
-                    JarUtils.extractFromJar(bakFile, jarEntry);
+                        final File bakFile = bakFile(patchFile, jarFile);
+                        if (!bakFile.exists()) {
+                            JarUtils.extractFromJar(bakFile, jarEntry);
+                        }
+                        JarUtils.putIntoJar(patchFile, jarEntry);
+                    }
                 }
-                JarUtils.putIntoJar(patchFile, jarEntry);
             }
         }
     }
@@ -70,11 +74,13 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
                 final String targetFileName = patchFile.getName();
 
-                final File jarFile = new File(patchTarget.getPathToArchive());
-                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                for (final String pathToArchive : patchTarget.getPathToArchives()) {
+                    final File jarFile = new File(pathToArchive);
+                    final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-                if (filesAreDifferent(patchFile, jarEntry)) {
-                    filesArePatched = false;
+                    if (filesAreDifferent(patchFile, jarEntry)) {
+                        filesArePatched = false;
+                    }
                 }
             }
         }
@@ -93,14 +99,16 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
             final String targetFileName = patchFile.getName();
 
-            final File jarFile = new File(patchTarget.getPathToArchive());
-            final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+            for (final String pathToArchive : patchTarget.getPathToArchives()) {
+                final File jarFile = new File(pathToArchive);
+                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-            final File bakFile = bakFile(patchFile, jarFile);
+                final File bakFile = bakFile(patchFile, jarFile);
 
-            if (bakFileExists(bakFile) && filesAreDifferent(bakFile, jarEntry)) {
-                JarUtils.putIntoJar(bakFile, jarEntry);
-                jarWasModified = true;
+                if (bakFileExists(bakFile) && filesAreDifferent(bakFile, jarEntry)) {
+                    JarUtils.putIntoJar(bakFile, jarEntry);
+                    jarWasModified = true;
+                }
             }
         }
 
