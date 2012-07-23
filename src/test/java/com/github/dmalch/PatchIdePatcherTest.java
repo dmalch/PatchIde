@@ -234,6 +234,18 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         thenFilesWerePatched(result);
     }
 
+    @Test
+    public void testCheckModificationsDoesNotCheckNotExistingArchives() throws Exception {
+        final File patchFile = givenPatchFile();
+        final TFile zipFileToPatch = randomPatchFileName();
+
+        final PatchIdePatcher patcher = givenPatcherFor(patchFile, zipFileToPatch);
+
+        final boolean result = whenCheckFilesArePatched(patcher);
+
+        thenFilesWerePatched(result);
+    }
+
     private TFile givenZipFileToPatch() {
         return givenZipFileToPatch("");
     }
@@ -305,7 +317,7 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
 
     private TFile givenZipFileToPatch(final String expectedDir) {
         final File originalFile = new File("src/test/resources/file.zip");
-        final File fileToPatch = new File(format("out/test/file_to_patch{0}.zip", randomAlphanumeric(5)));
+        final File fileToPatch = randomPatchFileName();
         try {
             Files.copy(originalFile, fileToPatch);
         } catch (IOException e) {
@@ -313,6 +325,10 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
         }
 
         return new TFile(fileToPatch, format("{0}/file.txt", expectedDir));
+    }
+
+    private TFile randomPatchFileName() {
+        return new TFile(format("out/test/file_to_patch{0}.zip", randomAlphanumeric(5)));
     }
 
     private PatchIdePatcher givenPatcherFor(final File expectedFile, final Collection<TFile> zipFilesToPatch, final String innerDirectory, final String minimalRevision, final String maximumRevision) {

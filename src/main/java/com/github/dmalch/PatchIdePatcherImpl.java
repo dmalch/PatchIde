@@ -80,7 +80,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                     final File jarFile = new File(pathToArchive);
                     final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-                    if (filesAreDifferent(patchFile, jarEntry)) {
+                    if (jarFile.exists() && filesAreDifferent(patchFile, jarEntry)) {
                         filesArePatched = false;
                     }
                 }
