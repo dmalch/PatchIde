@@ -5,9 +5,9 @@
 
     <description>Patches IDEA. Intended to be used in combo with Color IDE plugin. When Color IDE is installed several UI issues appears. These issues can be fixed by only changing IDEA source code or files. This plugin fixes issues by patching IDE installation. All patches are contributed into IDEA source code and can appear in new versions by default.</description>
 
-    <change-notes>Initial version</change-notes>
+    <change-notes>Add PyCharm and RubyMine support</change-notes>
 
-    <version>1.0</version>
+    <version>1.1</version>
 
     <idea-version since-build="107.105"/>
 
