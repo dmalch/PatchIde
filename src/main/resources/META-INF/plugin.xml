@@ -11,7 +11,7 @@
 
     <idea-version since-build="107.105"/>
 
-    <vendor url="https://github.com/dmalch/ColorIde">Dmitry Malchikov</vendor>
+    <vendor url="https://github.com/dmalch/PatchIde">Dmitry Malchikov</vendor>
 
     <depends>com.intellij.modules.lang</depends>
 

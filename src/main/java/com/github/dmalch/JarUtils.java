@@ -15,7 +15,7 @@ import static java.text.MessageFormat.format;
 
 public class JarUtils {
 
-    public static void putIntoJar(final File patchFile, final TFile jarEntry) {
+    public static void putIntoJar(final TFile patchFile, final TFile jarEntry) {
         removeObsoleteFile(jarEntry);
         createNewFile(patchFile, jarEntry);
     }
@@ -40,7 +40,7 @@ public class JarUtils {
         return new TFile(format("{0}/{1}/{2}", jarFile.getAbsolutePath(), dirInJar, targetFileName));
     }
 
-    private static void createNewFile(final File patchFilePath, final TFile jar) {
+    private static void createNewFile(final TFile patchFilePath, final TFile jar) {
         TFileInputStream inputStream = null;
         TFileOutputStream outputStream = null;
         try {

@@ -2,6 +2,7 @@ package com.github.dmalch;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
+import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 
 import java.io.File;
@@ -11,10 +12,10 @@ import static com.google.common.io.Closeables.closeQuietly;
 import static java.text.MessageFormat.format;
 
 public class AbstractPatchTest {
-    protected File givenPatchFile(final String copiedDirName) {
+    protected TFile givenPatchFile(final String copiedDirName) {
         final File originalFile = new File("src/test/resources/file.txt");
         final File copiedDir = new File(format("out/test/{0}", copiedDirName));
-        final File copiedFile = new File(copiedDir, "file.txt");
+        final TFile copiedFile = new TFile(copiedDir, "file.txt");
         try {
             copiedDir.mkdirs();
             Files.copy(originalFile, copiedFile);

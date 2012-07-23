@@ -23,7 +23,7 @@ public class JarUtilsTest extends AbstractPatchTest {
 
     @Test
     public void testReplaceFileInJar() throws Exception {
-        final File file = givenPatchFile("");
+        final TFile file = givenPatchFile("");
         final File jarFile = givenEmptyJarFile(file.getName(), ARCHIVE_JAR, DIR);
 
         whenPutFileIntoJarFile(file, jarFile, DIR);
@@ -48,7 +48,7 @@ public class JarUtilsTest extends AbstractPatchTest {
         return new File(ARCHIVE_JAR);
     }
 
-    private void whenPutFileIntoJarFile(final File file, final File jarFile, final String dirInJar) {
+    private void whenPutFileIntoJarFile(final TFile file, final File jarFile, final String dirInJar) {
         putIntoJar(file, JarUtils.jarFile(jarFile, dirInJar, file.getName()));
     }
 

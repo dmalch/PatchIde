@@ -105,7 +105,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                 final File jarFile = new File(pathToArchive);
                 final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
-                final File bakFile = bakFile(patchFile, jarFile);
+                final TFile bakFile = bakFile(patchFile, jarFile);
 
                 if (bakFileExists(bakFile) && filesAreDifferent(bakFile, jarEntry)) {
                     JarUtils.putIntoJar(bakFile, jarEntry);
@@ -144,8 +144,8 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         }
     }
 
-    private File bakFile(final File patchFile, final File jarFile) {
-        return new File(format("{0}/{1}.bak", jarFile.getParent(), patchFile.getName()));
+    private TFile bakFile(final File patchFile, final File jarFile) {
+        return new TFile(format("{0}/{1}.bak", jarFile.getParent(), patchFile.getName()));
     }
 
     @Override
