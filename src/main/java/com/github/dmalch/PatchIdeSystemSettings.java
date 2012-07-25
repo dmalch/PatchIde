@@ -89,7 +89,7 @@ public class PatchIdeSystemSettings implements Configurable {
         return patchIdeApplicationComponent;
     }
 
-    public void setPatchIdeApplicationComponent(final PatchIdeApplicationComponentImpl patchIdeApplicationComponent) {
+    public void setPatchIdeApplicationComponent(final PatchIdeApplicationComponent patchIdeApplicationComponent) {
         this.patchIdeApplicationComponent = patchIdeApplicationComponent;
     }
 }

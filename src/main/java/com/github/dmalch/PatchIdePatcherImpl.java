@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.zip.CRC32;
 
+import static com.github.dmalch.JarUtils.*;
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.text.MessageFormat.format;
@@ -35,13 +36,13 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                 for (final String pathToArchive : patchTarget.getPathToArchives()) {
                     final File jarFile = new File(pathToArchive);
                     if (jarFile.exists()) {
-                        final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                        final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
                         final File bakFile = bakFile(patchFile, jarFile);
                         if (!bakFile.exists()) {
-                            JarUtils.extractFromJar(bakFile, jarEntry);
+                            extractFromJar(bakFile, jarEntry);
                         }
-                        JarUtils.putIntoJar(patchFile, jarEntry);
+                        putIntoJar(patchFile, jarEntry);
                     }
                 }
             }
@@ -78,7 +79,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
                 for (final String pathToArchive : patchTarget.getPathToArchives()) {
                     final File jarFile = new File(pathToArchive);
-                    final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                    final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
                     if (jarFile.exists() && filesAreDifferent(patchFile, jarEntry)) {
                         filesArePatched = false;
@@ -103,12 +104,12 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
 
             for (final String pathToArchive : patchTarget.getPathToArchives()) {
                 final File jarFile = new File(pathToArchive);
-                final TFile jarEntry = JarUtils.jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
+                final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
                 final TFile bakFile = bakFile(patchFile, jarFile);
 
                 if (bakFileExists(bakFile) && filesAreDifferent(bakFile, jarEntry)) {
-                    JarUtils.putIntoJar(bakFile, jarEntry);
+                    putIntoJar(bakFile, jarEntry);
                     jarWasModified = true;
                 }
             }

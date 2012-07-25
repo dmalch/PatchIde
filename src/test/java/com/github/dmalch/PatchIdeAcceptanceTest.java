@@ -7,6 +7,9 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import static com.github.dmalch.PatchIdeApplicationComponentImpl.SHOW_PATCH_DIALOG;
 import static com.github.dmalch.PatchIdeApplicationComponentImpl.USER_ACCEPTED_PATCHING;
 import static com.intellij.openapi.ui.Messages.OK;
@@ -16,7 +19,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class PatchIdeAcceptanceTest {
 
     @Mock
-    private AcceptPatchingDialog acceptPatchingDialog;
+    private PatchingDialogs patchingDialogs;
 
     @Mock
     private ApplicationRestarter applicationRestarter;
@@ -102,6 +105,28 @@ public class PatchIdeAcceptanceTest {
         thenDialogIsNotShown();
     }
 
+    @Test
+    public void testErrorPopupIsShownWhenPatchExceptionOccurred() throws Exception {
+        givenPatchIdeIsRunFirstTime();
+        givenNotEnoughPrivileges();
+
+        whenStartPatchIde();
+
+        thenAccessDeniedErrorIsShown();
+    }
+
+    private void thenAccessDeniedErrorIsShown() {
+        verify(patchingDialogs).showAccessDeniedError();
+    }
+
+    private void givenNotEnoughPrivileges() {
+        doThrow(accessDenied()).when(patcher).applyPatch();
+    }
+
+    private RuntimeException accessDenied() {
+        return new RuntimeException(new FileNotFoundException().initCause(new IOException("Access is denied")));
+    }
+
     private void givenSeveralFilesArePatched() {
         when(patcher.applyRollback()).thenReturn(true);
     }
@@ -123,7 +148,7 @@ public class PatchIdeAcceptanceTest {
     }
 
     private void thenDialogIsNotShown() {
-        verify(acceptPatchingDialog, never()).showDialog();
+        verify(patchingDialogs, never()).showPatchDialog();
     }
 
     private void thenPatchIsNotAppliedAndRebootIsNotPerformed() {
@@ -144,7 +169,7 @@ public class PatchIdeAcceptanceTest {
     }
 
     private void whenDiscardPatching() {
-        when(acceptPatchingDialog.showDialog()).thenReturn(Messages.CANCEL);
+        when(patchingDialogs.showPatchDialog()).thenReturn(Messages.CANCEL);
         whenStartPatchIde();
     }
 
@@ -156,12 +181,12 @@ public class PatchIdeAcceptanceTest {
     }
 
     private void whenAcceptPatching() {
-        when(acceptPatchingDialog.showDialog()).thenReturn(OK);
+        when(patchingDialogs.showPatchDialog()).thenReturn(OK);
         whenStartPatchIde();
     }
 
     private void thenDialogIsShown() {
-        verify(acceptPatchingDialog).showDialog();
+        verify(patchingDialogs).showPatchDialog();
     }
 
     private void whenStartPatchIde() {

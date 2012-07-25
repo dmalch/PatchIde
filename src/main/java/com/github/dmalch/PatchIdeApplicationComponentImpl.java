@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
+
 import static com.intellij.openapi.ui.DialogWrapper.OK_EXIT_CODE;
 
 public class PatchIdeApplicationComponentImpl implements ApplicationComponent, PatchIdeApplicationComponent {
@@ -15,11 +17,11 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
 
     private PersistenceManager persistenceManager = new PersistenceManagerImpl();
 
-    private AcceptPatchingDialog acceptPatchingDialog = new AcceptPatchingDialog();
-
     private ApplicationRestarter restarter = new ApplicationRestarterImpl();
 
     private PatchIdePatcher patcher = new PatchIdePatcherImpl();
+
+    private PatchingDialogs patchingDialogs = new PatchingDialogsImpl();
 
     public PatchIdeApplicationComponentImpl() {
         final ImmutableMap.Builder<String, PatchTarget> builder = new ImmutableMap.Builder<String, PatchTarget>();
@@ -51,9 +53,22 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
 
     @Override
     public void performPatching() {
-        userHasAcceptedPatching();
-        patcher.applyPatch();
-        restarter.restart();
+        try {
+            userHasAcceptedPatching();
+            patcher.applyPatch();
+            restarter.restart();
+        } catch (RuntimeException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof FileNotFoundException) {
+                if (accessDeniedIs(cause)) {
+                    patchingDialogs.showAccessDeniedError();
+                }
+            }
+        }
+    }
+
+    private boolean accessDeniedIs(final Throwable cause) {
+        return cause.getCause().getMessage().contains("Access is denied");
     }
 
     private void userHasRejectedPatching() {
@@ -70,7 +85,7 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
     }
 
     private boolean userWantsToPatchClasses() {
-        return Objects.equal(OK_EXIT_CODE, acceptPatchingDialog.showDialog());
+        return Objects.equal(OK_EXIT_CODE, patchingDialogs.showPatchDialog());
     }
 
     private void doNotShowPatchDialogAnyMore() {
@@ -90,10 +105,6 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
         return persistenceManager.getBoolean(SHOW_PATCH_DIALOG, true);
     }
 
-    public AcceptPatchingDialog getAcceptPatchingDialog() {
-        return acceptPatchingDialog;
-    }
-
     @Override
     public void disposeComponent() {
     }
@@ -104,8 +115,12 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
         return "PatchIdeApplicationComponent";
     }
 
-    public void setAcceptPatchingDialog(final AcceptPatchingDialog acceptPatchingDialog) {
-        this.acceptPatchingDialog = acceptPatchingDialog;
+    public PatchingDialogs getPatchingDialogs() {
+        return patchingDialogs;
+    }
+
+    public void setPatchingDialogs(final PatchingDialogs patchingDialogs) {
+        this.patchingDialogs = patchingDialogs;
     }
 
     public ApplicationRestarter getRestarter() {
