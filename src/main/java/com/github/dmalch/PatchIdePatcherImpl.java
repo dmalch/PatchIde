@@ -15,6 +15,7 @@ import java.util.zip.CRC32;
 import static com.github.dmalch.JarUtils.*;
 import static com.google.common.base.Objects.firstNonNull;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.intellij.openapi.application.PathManager.getLibPath;
 import static java.text.MessageFormat.format;
 
 public class PatchIdePatcherImpl implements PatchIdePatcher {
@@ -34,7 +35,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                 final String targetFileName = patchFile.getName();
 
                 for (final String pathToArchive : patchTarget.getPathToArchives()) {
-                    final File jarFile = new File(pathToArchive);
+                    final File jarFile = findFileInLibDirectory(pathToArchive);
                     if (jarFile.exists()) {
                         final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
@@ -78,7 +79,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
                 final String targetFileName = patchFile.getName();
 
                 for (final String pathToArchive : patchTarget.getPathToArchives()) {
-                    final File jarFile = new File(pathToArchive);
+                    final File jarFile = findFileInLibDirectory(pathToArchive);
                     final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
                     if (jarFile.exists() && filesAreDifferent(patchFile, jarEntry)) {
@@ -103,7 +104,7 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
             final String targetFileName = patchFile.getName();
 
             for (final String pathToArchive : patchTarget.getPathToArchives()) {
-                final File jarFile = new File(pathToArchive);
+                final File jarFile = findFileInLibDirectory(pathToArchive);
                 final TFile jarEntry = jarFile(jarFile, patchTarget.getInnerDir(), targetFileName);
 
                 final TFile bakFile = bakFile(patchFile, jarFile);
@@ -116,6 +117,10 @@ public class PatchIdePatcherImpl implements PatchIdePatcher {
         }
 
         return jarWasModified;
+    }
+
+    public File findFileInLibDirectory(final String relativePath) {
+        return new File(format("{0}/{1}", getLibPath(), relativePath));
     }
 
     private boolean bakFileExists(final File bakFile) {

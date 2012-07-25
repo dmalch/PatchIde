@@ -11,12 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
 import static com.google.common.collect.Collections2.transform;
+import static com.intellij.openapi.application.PathManager.getLibPath;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -328,12 +328,12 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     }
 
     private TFile randomPatchFileName() {
-        return new TFile(format("out/test/file_to_patch{0}.zip", randomAlphanumeric(5)));
+        return new TFile(format("{0}/file_to_patch{1}.zip", getLibPath(), randomAlphanumeric(5)));
     }
 
     private PatchIdePatcher givenPatcherFor(final File expectedFile, final Collection<TFile> zipFilesToPatch, final String innerDirectory, final String minimalRevision, final String maximumRevision) {
         idePatcher.setFilesToPatch(ImmutableMap.of(expectedFile.getAbsolutePath(), patchTarget(innerDirectory, transform(zipFilesToPatch, extractArchivePath()), minimalRevision, maximumRevision)));
-        new File("out/test/file.txt.bak").delete();
+        new File(format("{0}/file.txt.bak", getLibPath())).delete();
 
         when(revisionManager.isCurrentVersionGreaterThen(minimalRevision)).thenReturn(true);
         when(revisionManager.isCurrentVersionLowerThen(maximumRevision)).thenReturn(true);
@@ -343,16 +343,11 @@ public class PatchIdePatcherTest extends AbstractPatchTest {
     private Function<TFile, String> extractArchivePath() {
         return new Function<TFile, String>() {
             @Override
-            public String apply(@Nullable final TFile zipFilesToPatch) {
-                return zipFilesToPatch.getInnerArchive().getAbsolutePath();
+            public String apply(final TFile zipFilesToPatch) {
+                return zipFilesToPatch.getInnerArchive().getName();
             }
         };
     }
-
-    private PatchTarget patchTarget(final String innerDir, final String pathToArchive, final String minimalRevision, final String maximumRevision) {
-        return new PatchTarget(innerDir, pathToArchive, minimalRevision, maximumRevision);
-    }
-
 
     private PatchTarget patchTarget(final String innerDir, final Collection<String> pathToArchives, final String minimalRevision, final String maximumRevision) {
         return new PatchTarget(innerDir, pathToArchives, minimalRevision, maximumRevision);

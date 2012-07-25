@@ -9,12 +9,13 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.google.common.io.Closeables.closeQuietly;
+import static com.intellij.openapi.application.PathManager.getLibPath;
 import static java.text.MessageFormat.format;
 
 public class AbstractPatchTest {
     protected TFile givenPatchFile(final String copiedDirName) {
         final File originalFile = new File("src/test/resources/file.txt");
-        final File copiedDir = new File(format("out/test/{0}", copiedDirName));
+        final File copiedDir = new File(format("{0}/{1}", getLibPath(), copiedDirName));
         final TFile copiedFile = new TFile(copiedDir, "file.txt");
         try {
             copiedDir.mkdirs();
