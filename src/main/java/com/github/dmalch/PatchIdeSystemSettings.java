@@ -48,9 +48,9 @@ public class PatchIdeSystemSettings implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         if (patchCheckboxIsSelected()) {
-            getPatchIdeApplicationComponent().performPatching();
+            getPatchIdeApplicationComponent().performPatching(true);
         } else if (Objects.equal(shouldPatchIdea.getState(), NOT_SELECTED)) {
-            getPatchIdeApplicationComponent().performRollback();
+            getPatchIdeApplicationComponent().performRollback(true);
         }
     }
 

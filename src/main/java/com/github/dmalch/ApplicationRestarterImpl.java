@@ -7,15 +7,14 @@ import static com.intellij.openapi.ui.Messages.*;
 
 public class ApplicationRestarterImpl implements ApplicationRestarter {
     @Override
-    public void restart() {
-        ApplicationManagerEx.getApplicationEx().restart();
+    public void restart(final Boolean askBeforeRestart) {
+        if (!askBeforeRestart || (userWantsToRestart())) {
+            ApplicationManagerEx.getApplicationEx().restart();
+        }
     }
 
-    @Override
-    public void askToRestart() {
-        if (Objects.equal(showDialog(), OK)) {
-            restart();
-        }
+    private boolean userWantsToRestart() {
+        return Objects.equal(showDialog(), OK);
     }
 
     private int showDialog() {

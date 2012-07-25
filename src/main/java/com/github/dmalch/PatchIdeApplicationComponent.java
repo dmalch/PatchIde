@@ -1,9 +1,9 @@
 package com.github.dmalch;
 
 public interface PatchIdeApplicationComponent {
-    void performRollback();
+    void performRollback(final Boolean askBeforeRestart);
 
-    void performPatching();
+    void performPatching(final Boolean askBeforeRestart);
 
     boolean isUserHasAcceptedPatching();
 

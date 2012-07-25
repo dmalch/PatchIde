@@ -178,12 +178,12 @@ public class PatchIdeAcceptanceTest {
 
     private void thenPatchIsNotAppliedAndRebootIsNotPerformed() {
         thenPatchIsNotApplied();
-        verify(applicationRestarter, never()).restart();
+        verify(applicationRestarter, never()).restart(false);
     }
 
     private void thenPatchIsNotAppliedAndRebootIsPerformed() {
         thenPatchIsNotApplied();
-        verify(applicationRestarter).restart();
+        verify(applicationRestarter).restart(false);
     }
 
     private void thenPatchIsNotApplied() {
@@ -200,7 +200,7 @@ public class PatchIdeAcceptanceTest {
 
     private void thenPatchIsAppliedAndRebootDialogIsShown() {
         verify(patcher).applyPatch();
-        verify(applicationRestarter).restart();
+        verify(applicationRestarter).restart(false);
         verify(persistenceManager).setBoolean(SHOW_PATCH_DIALOG, false);
         verify(persistenceManager).setBoolean(USER_ACCEPTED_PATCHING, true);
     }

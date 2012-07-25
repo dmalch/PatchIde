@@ -88,12 +88,11 @@ public class PatchIdeSystemSettingsTest {
     }
 
     private void thenRollBackIsPerformed() {
-        verify(patchIdeApplicationComponent).performRollback();
-        ;
+        verify(patchIdeApplicationComponent).performRollback(true);
     }
 
     private void thenPatchingIsPerformed() {
-        verify(patchIdeApplicationComponent).performPatching();
+        verify(patchIdeApplicationComponent).performPatching(true);
     }
 
     private void whenUserAppliesRollback() throws ConfigurationException {

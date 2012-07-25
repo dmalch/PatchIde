@@ -36,19 +36,19 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
         if (shouldShowPatchDialog()) {
             doNotShowPatchDialogAnyMore();
             if (userWantsToPatchClasses()) {
-                performPatching();
+                performPatching(false);
             } else {
-                performRollback();
+                performRollback(false);
             }
         }
     }
 
     @Override
-    public void performRollback() {
+    public void performRollback(final Boolean askBeforeRestart) {
         try {
             userHasRejectedPatching();
             if (patcher.applyRollback()) {
-                restarter.restart();
+                restarter.restart(askBeforeRestart);
             }
         } catch (RuntimeException e) {
             showErrorToUser(e);
@@ -56,11 +56,11 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
     }
 
     @Override
-    public void performPatching() {
+    public void performPatching(final Boolean askBeforeRestart) {
         try {
             userHasAcceptedPatching();
             patcher.applyPatch();
-            restarter.restart();
+            restarter.restart(askBeforeRestart);
         } catch (RuntimeException e) {
             showErrorToUser(e);
         }
