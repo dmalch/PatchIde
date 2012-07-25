@@ -115,12 +115,24 @@ public class PatchIdeAcceptanceTest {
         thenAccessDeniedErrorIsShown();
     }
 
+    @Test
+    public void testErrorPopupIsShownWhenRollbackExceptionOccurred() throws Exception {
+        givenPatchIdeIsRunFirstTime();
+        givenSeveralFilesArePatched();
+        givenNotEnoughPrivileges();
+
+        whenDiscardPatching();
+
+        thenAccessDeniedErrorIsShown();
+    }
+
     private void thenAccessDeniedErrorIsShown() {
         verify(patchingDialogs).showAccessDeniedError();
     }
 
     private void givenNotEnoughPrivileges() {
         doThrow(accessDenied()).when(patcher).applyPatch();
+        doThrow(accessDenied()).when(patcher).applyRollback();
     }
 
     private RuntimeException accessDenied() {

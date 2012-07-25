@@ -45,9 +45,13 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
 
     @Override
     public void performRollback() {
-        userHasRejectedPatching();
-        if (patcher.applyRollback()) {
-            restarter.restart();
+        try {
+            userHasRejectedPatching();
+            if (patcher.applyRollback()) {
+                restarter.restart();
+            }
+        } catch (RuntimeException e) {
+            showErrorToUser(e);
         }
     }
 
@@ -58,11 +62,15 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
             patcher.applyPatch();
             restarter.restart();
         } catch (RuntimeException e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof FileNotFoundException) {
-                if (accessDeniedIs(cause)) {
-                    patchingDialogs.showAccessDeniedError();
-                }
+            showErrorToUser(e);
+        }
+    }
+
+    private void showErrorToUser(final RuntimeException e) {
+        final Throwable cause = e.getCause();
+        if (cause instanceof FileNotFoundException) {
+            if (accessDeniedIs(cause)) {
+                patchingDialogs.showAccessDeniedError();
             }
         }
     }
