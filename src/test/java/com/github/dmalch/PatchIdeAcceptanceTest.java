@@ -126,6 +126,19 @@ public class PatchIdeAcceptanceTest {
         thenAccessDeniedErrorIsShown();
     }
 
+
+    @Test(expected = RuntimeException.class)
+    public void testUnckownErrorShouldBeThrownToTheCore() throws Exception {
+        givenPatchIdeIsRunFirstTime();
+        givenUnknownError();
+
+        whenStartPatchIde();
+    }
+
+    private void givenUnknownError() {
+        doThrow(new RuntimeException("Unknown")).when(patcher).applyPatch();
+    }
+
     private void thenAccessDeniedErrorIsShown() {
         verify(patchingDialogs).showAccessDeniedError();
     }

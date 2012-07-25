@@ -72,6 +72,8 @@ public class PatchIdeApplicationComponentImpl implements ApplicationComponent, P
             if (accessDeniedIs(cause)) {
                 patchingDialogs.showAccessDeniedError();
             }
+        } else {
+            throw e;
         }
     }
 
