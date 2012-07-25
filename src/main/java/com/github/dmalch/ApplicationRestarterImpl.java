@@ -1,18 +1,15 @@
 package com.github.dmalch;
 
 import com.google.common.base.Objects;
-import com.intellij.ide.IdeBundle;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.ui.Messages;
-import org.jetbrains.annotations.NonNls;
 
 import static com.intellij.openapi.ui.Messages.OK;
+import static java.text.MessageFormat.format;
 
 public class ApplicationRestarterImpl implements ApplicationRestarter {
-    @NonNls
-    private static final String POSTPONE = "&Postpone";
 
     @Override
     public void restart(final Boolean askBeforeRestart) {
@@ -37,12 +34,12 @@ public class ApplicationRestarterImpl implements ApplicationRestarter {
     }
 
     private int showRestartDialog() {
-        String message = IdeBundle.message("message.idea.restart.required", ApplicationNamesInfo.getInstance().getProductName());
-        return Messages.showYesNoDialog(message, "Restart", "Restart", POSTPONE, Messages.getQuestionIcon());
+        String message = format("Restart {0} to activate changes?", ApplicationNamesInfo.getInstance().getProductName());
+        return Messages.showYesNoDialog(message, "Restart", "Restart", "&Postpone", Messages.getQuestionIcon());
     }
 
     private int showShutdownDialog() {
-        String message = IdeBundle.message("message.idea.shutdown.required", ApplicationNamesInfo.getInstance().getProductName());
-        return Messages.showYesNoDialog(message, "Restart", "Shut Down", POSTPONE, Messages.getQuestionIcon());
+        String message = format("Shut down {0} to activate changes?", ApplicationNamesInfo.getInstance().getProductName());
+        return Messages.showYesNoDialog(message, "Restart", "Shut Down", "&Postpone", Messages.getQuestionIcon());
     }
 }
