@@ -6,13 +6,10 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.util.ui.ThreeStateCheckBox.State.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -25,19 +22,9 @@ public class PatchIdeSystemSettingsTest {
     @Mock
     private PatchIdeApplicationComponent patchIdeApplicationComponent;
 
-    @Mock
-    private PersistenceManager persistenceManager;
-
-    @Mock
-    private PatchIdePatcher patcher;
-
-    @Mock
-    private ApplicationRestarter restarter;
-
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        when(patchIdeApplicationComponent.getPatcher()).thenReturn(patcher);
     }
 
     @Test
@@ -101,15 +88,12 @@ public class PatchIdeSystemSettingsTest {
     }
 
     private void thenRollBackIsPerformed() {
-        verify(patcher).applyRollback();
-        verify(persistenceManager).setBoolean(USER_ACCEPTED_PATCHING, false);
-        verify(restarter).askToRestart();
+        verify(patchIdeApplicationComponent).performRollback();
+        ;
     }
 
     private void thenPatchingIsPerformed() {
-        verify(patcher).applyPatch();
-        verify(persistenceManager).setBoolean(USER_ACCEPTED_PATCHING, true);
-        verify(restarter).askToRestart();
+        verify(patchIdeApplicationComponent).performPatching();
     }
 
     private void whenUserAppliesRollback() throws ConfigurationException {
@@ -126,19 +110,19 @@ public class PatchIdeSystemSettingsTest {
     }
 
     private void givenPatchedFilesFound() {
-        when(patcher.checkFilesArePatched()).thenReturn(true);
+        when(patchIdeApplicationComponent.filesAreNotPatched()).thenReturn(false);
     }
 
     private void givenNoPatchedFilesFound() {
-        when(patcher.checkFilesArePatched()).thenReturn(false);
+        when(patchIdeApplicationComponent.filesAreNotPatched()).thenReturn(true);
     }
 
     private void givenUserAcceptedPatch() {
-        when(persistenceManager.getBoolean(eq(USER_ACCEPTED_PATCHING), anyBoolean())).thenReturn(true);
+        when(patchIdeApplicationComponent.isUserHasAcceptedPatching()).thenReturn(true);
     }
 
     private void givenUserRejectedPatch() {
-        when(persistenceManager.getBoolean(eq(USER_ACCEPTED_PATCHING), anyBoolean())).thenReturn(false);
+        when(patchIdeApplicationComponent.isUserHasAcceptedPatching()).thenReturn(false);
     }
 
     private void thenCheckBoxIsSelected() {

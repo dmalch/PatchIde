@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nls;
 
 import javax.swing.*;
 
-import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
 import static com.intellij.util.ui.ThreeStateCheckBox.State.*;
 
 public class PatchIdeSystemSettings implements Configurable {
@@ -18,10 +17,6 @@ public class PatchIdeSystemSettings implements Configurable {
     private ThreeStateCheckBox shouldPatchIdea;
 
     private PatchIdeApplicationComponent patchIdeApplicationComponent;
-
-    private PersistenceManager persistenceManager = new PersistenceManagerImpl();
-
-    private ApplicationRestarter restarter = new ApplicationRestarterImpl();
 
     private ThreeStateCheckBox.State initialState;
 
@@ -42,16 +37,7 @@ public class PatchIdeSystemSettings implements Configurable {
     }
 
     private boolean isUserHasAcceptedPatching() {
-        return persistenceManager.getBoolean(USER_ACCEPTED_PATCHING, true);
-    }
-
-    private boolean filesArePatched() {
-        final PatchIdePatcher patcher = getPatcher();
-        return patcher.checkFilesArePatched();
-    }
-
-    private PatchIdePatcher getPatcher() {
-        return getPatchIdeApplicationComponent().getPatcher();
+        return getPatchIdeApplicationComponent().isUserHasAcceptedPatching();
     }
 
     @Override
@@ -61,21 +47,21 @@ public class PatchIdeSystemSettings implements Configurable {
 
     @Override
     public void apply() throws ConfigurationException {
-        if (Objects.equal(shouldPatchIdea.getState(), SELECTED)) {
-            userHasAcceptedPatching();
-            getPatcher().applyPatch();
-            restarter.askToRestart();
+        if (patchCheckboxIsSelected()) {
+            getPatchIdeApplicationComponent().performPatching();
         } else if (Objects.equal(shouldPatchIdea.getState(), NOT_SELECTED)) {
-            userHasRejectedPatching();
-            getPatcher().applyRollback();
-            restarter.askToRestart();
+            getPatchIdeApplicationComponent().performRollback();
         }
+    }
+
+    private boolean patchCheckboxIsSelected() {
+        return Objects.equal(shouldPatchIdea.getState(), SELECTED);
     }
 
     @Override
     public void reset() {
         final boolean userHasAcceptedPatching = isUserHasAcceptedPatching();
-        final boolean filesArePatched = filesArePatched();
+        final boolean filesArePatched = !getPatchIdeApplicationComponent().filesAreNotPatched();
 
         if (userHasAcceptedPatching && filesArePatched) {
             initialState = SELECTED;
@@ -92,14 +78,6 @@ public class PatchIdeSystemSettings implements Configurable {
     public void disposeUIResources() {
     }
 
-    private void userHasAcceptedPatching() {
-        persistenceManager.setBoolean(USER_ACCEPTED_PATCHING, true);
-    }
-
-    private void userHasRejectedPatching() {
-        persistenceManager.setBoolean(USER_ACCEPTED_PATCHING, false);
-    }
-
     public ThreeStateCheckBox getShouldPatchIdea() {
         return shouldPatchIdea;
     }
@@ -111,15 +89,7 @@ public class PatchIdeSystemSettings implements Configurable {
         return patchIdeApplicationComponent;
     }
 
-    public void setPersistenceManager(final PersistenceManager persistenceManager) {
-        this.persistenceManager = persistenceManager;
-    }
-
-    public void setRestarter(final ApplicationRestarter restarter) {
-        this.restarter = restarter;
-    }
-
-    public void setPatchIdeApplicationComponent(final PatchIdeApplicationComponent patchIdeApplicationComponent) {
+    public void setPatchIdeApplicationComponent(final PatchIdeApplicationComponentImpl patchIdeApplicationComponent) {
         this.patchIdeApplicationComponent = patchIdeApplicationComponent;
     }
 }

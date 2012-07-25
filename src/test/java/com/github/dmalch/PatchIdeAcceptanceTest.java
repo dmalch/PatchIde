@@ -3,13 +3,13 @@ package com.github.dmalch;
 import com.intellij.openapi.ui.Messages;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.github.dmalch.PatchIdeApplicationComponent.SHOW_PATCH_DIALOG;
-import static com.github.dmalch.PatchIdeApplicationComponent.USER_ACCEPTED_PATCHING;
+import static com.github.dmalch.PatchIdeApplicationComponentImpl.SHOW_PATCH_DIALOG;
+import static com.github.dmalch.PatchIdeApplicationComponentImpl.USER_ACCEPTED_PATCHING;
 import static com.intellij.openapi.ui.Messages.OK;
-import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -21,14 +21,14 @@ public class PatchIdeAcceptanceTest {
     @Mock
     private ApplicationRestarter applicationRestarter;
 
-    @Mock(answer = RETURNS_MOCKS)
+    @Mock(answer = Answers.RETURNS_MOCKS)
     private PersistenceManager persistenceManager;
 
     @Mock
     private PatchIdePatcher patcher;
 
     @InjectMocks
-    private final PatchIdeApplicationComponent patchIdeApplicationComponent = new PatchIdeApplicationComponent();
+    private final PatchIdeApplicationComponentImpl patchIdeApplicationComponent = new PatchIdeApplicationComponentImpl();
 
     @Before
     public void setUp() throws Exception {
@@ -37,16 +37,16 @@ public class PatchIdeAcceptanceTest {
 
     @Test
     public void testPatchDialogIsShownAtFirstStart() throws Exception {
-        givenColorIdeIsRunFirstTime();
+        givenPatchIdeIsRunFirstTime();
 
-        whenStartColorIde();
+        whenStartPatchIde();
 
         thenDialogIsShown();
     }
 
     @Test
     public void testWhenUserAcceptsPatchingThenPatchIsAppliedAndIdeIsRebooted() {
-        givenColorIdeIsRunFirstTime();
+        givenPatchIdeIsRunFirstTime();
 
         whenAcceptPatching();
 
@@ -55,7 +55,7 @@ public class PatchIdeAcceptanceTest {
 
     @Test
     public void testWhenUserRejectsPatchingThenPatchIsRolledBackAndIfNoChangesIdeIsNotRebooted() {
-        givenColorIdeIsRunFirstTime();
+        givenPatchIdeIsRunFirstTime();
 
         whenDiscardPatching();
 
@@ -64,7 +64,7 @@ public class PatchIdeAcceptanceTest {
 
     @Test
     public void testWhenUserRejectsPatchingThenPatchIsRolledBackAndIfThereAreChangesIdeIsRebooted() {
-        givenColorIdeIsRunFirstTime();
+        givenPatchIdeIsRunFirstTime();
         givenSeveralFilesArePatched();
 
         whenDiscardPatching();
@@ -76,7 +76,7 @@ public class PatchIdeAcceptanceTest {
     public void testPatchDialogIsNotShownAfterFirstRun() throws Exception {
         givenColorIdeIsRunAfterFirstTime();
 
-        whenStartColorIde();
+        whenStartPatchIde();
 
         thenDialogIsNotShown();
     }
@@ -86,7 +86,7 @@ public class PatchIdeAcceptanceTest {
         givenColorIdeIsRunAfterFirstTime();
         givenNotAllFilesWerePatched();
 
-        whenStartColorIde();
+        whenStartPatchIde();
 
         thenDialogIsShown();
     }
@@ -97,7 +97,7 @@ public class PatchIdeAcceptanceTest {
         givenUserRejectedPatching();
         givenNotAllFilesWerePatched();
 
-        whenStartColorIde();
+        whenStartPatchIde();
 
         thenDialogIsNotShown();
     }
@@ -145,7 +145,7 @@ public class PatchIdeAcceptanceTest {
 
     private void whenDiscardPatching() {
         when(acceptPatchingDialog.showDialog()).thenReturn(Messages.CANCEL);
-        whenStartColorIde();
+        whenStartPatchIde();
     }
 
     private void thenPatchIsAppliedAndRebootDialogIsShown() {
@@ -157,18 +157,18 @@ public class PatchIdeAcceptanceTest {
 
     private void whenAcceptPatching() {
         when(acceptPatchingDialog.showDialog()).thenReturn(OK);
-        whenStartColorIde();
+        whenStartPatchIde();
     }
 
     private void thenDialogIsShown() {
         verify(acceptPatchingDialog).showDialog();
     }
 
-    private void whenStartColorIde() {
+    private void whenStartPatchIde() {
         patchIdeApplicationComponent.initComponent();
     }
 
-    private void givenColorIdeIsRunFirstTime() {
+    private void givenPatchIdeIsRunFirstTime() {
         when(persistenceManager.getBoolean(eq(SHOW_PATCH_DIALOG), anyBoolean())).thenReturn(true);
         givenNotAllFilesWerePatched();
         givenUserAcceptedPatching();

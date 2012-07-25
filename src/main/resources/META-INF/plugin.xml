@@ -3,11 +3,15 @@
 
     <id>PatchIde</id>
 
-    <description>Patches IDEA. Intended to be used in combo with Color IDE plugin. When Color IDE is installed several UI issues appears. These issues can be fixed by only changing IDEA source code or files. This plugin fixes issues by patching IDE installation. All patches are contributed into IDEA source code and can appear in new versions by default.</description>
+    <description>Patches IDEA. Intended to be used in combo with Color IDE plugin. When Color IDE is installed several
+        UI issues appears. These issues can be fixed by only changing IDEA source code or files. This plugin fixes
+        issues by patching IDE installation. All patches are contributed into IDEA source code and can appear in new
+        versions by default.
+    </description>
 
-    <change-notes>Add PyCharm and RubyMine support</change-notes>
+    <change-notes>Added error dialog when have no permissions to patch files</change-notes>
 
-    <version>1.1</version>
+    <version>1.2</version>
 
     <idea-version since-build="107.105"/>
 
@@ -17,7 +21,8 @@
 
     <application-components>
         <component>
-            <implementation-class>com.github.dmalch.PatchIdeApplicationComponent</implementation-class>
+            <interface-class>com.github.dmalch.PatchIdeApplicationComponent</interface-class>
+            <implementation-class>com.github.dmalch.PatchIdeApplicationComponentImpl</implementation-class>
         </component>
     </application-components>
 
