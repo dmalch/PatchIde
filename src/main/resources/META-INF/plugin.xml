@@ -9,11 +9,11 @@
         versions by default.
     </description>
 
-    <change-notes>Tuned restart settings. Fixed a couple of bugs related to patching as Administrator.</change-notes>
+    <change-notes>Not compatible with IDEA 10.5.x and lower</change-notes>
 
-    <version>1.3</version>
+    <version>1.3.1</version>
 
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="111.69"/>
 
     <vendor url="https://github.com/dmalch/PatchIde">Dmitry Malchikov</vendor>
 
